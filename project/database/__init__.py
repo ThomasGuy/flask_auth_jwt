@@ -4,10 +4,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from flask_bcrypt import Bcrypt
 
 db_scoped_session = scoped_session(sessionmaker(autocommit=False, autoflush=False))
 Base = declarative_base()
 Base.query = db_scoped_session.query_property()
+flask_bcrypt = Bcrypt()
 
 
 def init_db(db_path):
