@@ -1,14 +1,11 @@
 import datetime
 
 # third  party imports
-import jwt
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, or_
 from flask_bcrypt import generate_password_hash, check_password_hash
 
-from project.server import bcrypt
 from .. import Base
 from . import Blacklist
-from config import jwt_key
 
 
 class User(Base):
@@ -29,10 +26,10 @@ class User(Base):
 
     @password.setter
     def password(self, password):
-        self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)

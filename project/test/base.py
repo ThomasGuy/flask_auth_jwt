@@ -24,31 +24,27 @@ class BaseTestCase(TestCase):
         db_scoped_session.remove()
         Base.metadata.drop_all(self.engine)
 
-    # # helpers
-    # def register_user(self, username='joeseph', email='joe@gmail.com', password='123456', public_id=None):
-    #     """ register test user post request  """
-    #     return self.client.post(
-    #         '/auth/register',
-    #         data=json.dumps(dict(
-    #             public_id=public_id,
-    #             username=username,
-    #             email=email,
-    #             password=password,
-    #             registered_on=datetime.datetime.utcnow()
-    #         )),
-    #         content_type='application/json'
-    #     )
+    # helpers
+    def register_user(self, username='joeseph', email='joe@gmail.com', password='123456'):
+        """ register test user post request  """
+        return self.client.post(
+            '/auth/register',
+            data=json.dumps(dict(
+                username=username,
+                email=email,
+                password=password
+            )),
+            content_type='application/json'
+        )
 
-    # def login_user(self, username, email, password, public_id=None):
-    #     """ login test user post request """
-    #     return self.client.post(
-    #         '/auth/login',
-    #         data=json.dumps(dict(
-    #             public_id=public_id,
-    #             username=username,
-    #             email=email,
-    #             password=password,
-    #             registered_on=datetime.datetime.utcnow()
-    #         )),
-    #         content_type='application/json'
-    #     )
+    def login_user(self, username, email, password):
+        """ login test user post request """
+        return self.client.post(
+            '/auth/login',
+            data=json.dumps(dict(
+                username=username,
+                email=email,
+                password=password
+            )),
+            content_type='application/json'
+        )

@@ -9,11 +9,12 @@ db_name = 'jwt_auth'
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_precious_secret_key')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     TESTING = False
+    SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_precious_secret_key')
+    JWT_IDENTITY_CLAIMS = ''
 
 
 class DevelopmentConfig(Config):
