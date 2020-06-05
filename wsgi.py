@@ -21,14 +21,11 @@ COV = coverage.coverage(
 )
 COV.start()
 
-
 app, engine = create_app("config.DevelopmentConfig")
-
 
 @app.shell_context_processor
 def make_shell_context():
     return dict(app=app, db=db, User=User)
-
 
 @app.cli.command()
 def test():
@@ -49,8 +46,9 @@ def cov():
         COV.save()
         print('Coverage Summary:')
         COV.report()
-        # covdir = Path.cwd() / 'tmp/coverage'
-        # COV.html_report(directory=covdir)
+        covdir = Path.cwd() / 'tmp/coverage'
+        print(f'coverage-directory:- {str(covdir)}')
+        COV.html_report(directory=covdir)
         # print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
         return 0
