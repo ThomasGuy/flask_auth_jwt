@@ -46,3 +46,11 @@ class User(Base):
             if flask_bcrypt.check_password_hash(found_user.password_hash, password):
                 return found_user # make sure to return the user so we can log them in by storing information in the session
         return False
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'email': self.email,
+            'admin': self.admin,
+            'public_id': self.public_id
+        }

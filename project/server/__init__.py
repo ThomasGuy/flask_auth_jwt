@@ -7,7 +7,6 @@ from project.server.util.blacklist_helpers import is_token_revoked
 
 jwt = JWTManager()
 
-
 def create_app(Config):
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -51,5 +50,3 @@ def create_app(Config):
             db.remove()
 
     return app, engine
-
-import project.database.models

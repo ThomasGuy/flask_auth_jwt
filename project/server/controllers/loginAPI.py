@@ -23,8 +23,8 @@ class LoginAPI(MethodView):
                 if user.check_password(password):
                     # Create/Store the tokens in store with a status of not currently revoked.
                     user_claims = app.config['JWT_IDENTITY_CLAIM']
-                    auth_token = create_access_token(identity=user.id)
-                    refresh_token = create_refresh_token(identity=user.id)
+                    auth_token = create_access_token(identity=user.public_id)
+                    refresh_token = create_refresh_token(identity=user.public_id)
                     add_token_to_database(auth_token, user_claims)
                     add_token_to_database(refresh_token, user_claims)
                     responseObject = {

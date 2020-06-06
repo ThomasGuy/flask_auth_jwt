@@ -46,9 +46,9 @@ def cov():
         COV.save()
         print('Coverage Summary:')
         COV.report()
-        covdir = Path.cwd() / 'tmp/coverage'
-        print(f'coverage-directory:- {str(covdir)}')
-        COV.html_report(directory=covdir)
+        # covdir = Path.cwd() / 'tmp/coverage'
+        # print(f'coverage-directory:- {str(covdir)}')
+        # COV.html_report(directory=covdir)
         # print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
         return 0
