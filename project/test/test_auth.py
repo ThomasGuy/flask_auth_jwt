@@ -214,6 +214,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             print(f'get_current_user {data["get_current_user"]}')
             print(data['get_current_user']['admin'])
+            print('name:- ', data.get('name'))
 
     def test_using_revoked_access_token(self):
         """ Test - using revoked access token """

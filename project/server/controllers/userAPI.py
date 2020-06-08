@@ -29,7 +29,8 @@ class UserAPI(views.MethodView):
             responseObject = {
                 'status': 'success',
                 'message': 'You are authorized.',
-                'get_current_user': get_current_user()
+                'get_current_user': get_current_user(),
+                'name': current_user.get('username')
             }
             return make_response(jsonify(responseObject)), 200
         else:
