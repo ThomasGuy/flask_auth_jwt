@@ -43,7 +43,7 @@ def create_app(Config):
             if user is None:
                 return None
             else:
-                return user.username
+                return user.to_dict()
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):

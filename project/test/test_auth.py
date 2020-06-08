@@ -209,10 +209,11 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['message'] == 'You are authorized.')
             self.assertTrue(data is not None)
-            self.assertTrue(data['get_current_user'] == 'Thomas')
+            self.assertTrue(isinstance(data['get_current_user'], dict))
             # self.assertTrue(data['current_user']['admin'] == 'true' or 'false')
             self.assertEqual(response.status_code, 200)
             print(f'get_current_user {data["get_current_user"]}')
+            print(data['get_current_user']['admin'])
 
     def test_using_revoked_access_token(self):
         """ Test - using revoked access token """

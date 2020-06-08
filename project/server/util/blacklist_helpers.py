@@ -5,7 +5,7 @@ from flask_jwt_extended import decode_token
 
 from .exceptions import TokenNotFound
 from project.database.models import Blacklist
-from project.database import db_scoped_session as db_session
+from project.database import db_scoped_session as db
 
 
 def _epoch_utc_to_datetime(epoch_utc):
@@ -35,8 +35,8 @@ def add_token_to_database(encoded_token, identity_claim):
         expires=expires,
         revoked=revoked,
     )
-    db_session.add(db_token)
-    db_session.commit()
+    db.add(db_token)
+    db.commit()
 
 
 def is_token_revoked(decoded_token):
@@ -70,7 +70,7 @@ def revoke_token(token_id, user):
     try:
         token = Blacklist.query.filter_by(id=token_id, user_identity=user).one()
         token.revoked = True
-        db_session.commit()
+        db.commit()
     except NoResultFound:
         raise TokenNotFound("Could not find the token {}".format(token_id))
 
@@ -83,7 +83,7 @@ def unrevoke_token(token_id, user):
     try:
         token = Blacklist.query.filter_by(id=token_id, user_identity=user).one()
         token.revoked = False
-        db_session.commit()
+        db.commit()
     except NoResultFound:
         raise TokenNotFound("Could not find the token {}".format(token_id))
 
@@ -98,5 +98,5 @@ def prune_database():
     now = datetime.now()
     expired = Blacklist.query.filter(Blacklist.expires < now).all()
     for token in expired:
-        db_session.delete(token)
-    db_session.commit()
+        db.delete(token)
+    db.commit()
