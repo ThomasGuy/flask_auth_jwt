@@ -44,6 +44,7 @@ def create_app(Config):
             else:
                 return user.to_dict()
 
+
         @app.teardown_appcontext
         def shutdown_session(exception=None):
             db_scoped_session.remove()
