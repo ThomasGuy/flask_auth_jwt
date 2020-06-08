@@ -1,8 +1,7 @@
 from flask import Flask, jsonify
-from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 
-from project.database import init_db, db_scoped_session as db, flask_bcrypt
+from project.database import init_db, db_scoped_session, flask_bcrypt
 from project.server.util.blacklist_helpers import is_token_revoked
 
 jwt = JWTManager()
@@ -47,6 +46,6 @@ def create_app(Config):
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):
-            db.remove()
+            db_scoped_session.remove()
 
     return app, engine

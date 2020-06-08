@@ -1,11 +1,13 @@
 import os
 import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
 
-postgres_local_base = os.environ['DB_DATABASE']
 db_name = 'jwt_auth'
+local_sqldb = 'sqlite:///' + str(Path.cwd()) +'/'
+postgres_local_base = os.getenv('DB_DATABASE', local_sqldb)
 
 
 class Config:
