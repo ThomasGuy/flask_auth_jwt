@@ -13,7 +13,7 @@ registration_view = RegisterAPI.as_view('register_api')
 login_view = LoginAPI.as_view('login_api')
 logout_view = LogoutAPI.as_view('logout_api')
 refresh_view = RefreshToken.as_view('refresh_api')
-user_status_view = UserAPI.as_view('user-api')
+user_status_view = UserAPI.as_view('user_api')
 protected_view = ProtectedAPI.as_view('protected_api')
 
 auth_blueprint.add_url_rule(

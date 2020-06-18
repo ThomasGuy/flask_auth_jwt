@@ -21,7 +21,7 @@ COV = coverage.coverage(
 )
 COV.start()
 
-app, engine = create_app("config.DevelopmentConfig")
+app, engine = create_app("config.ProductionConfig")
 
 @app.shell_context_processor
 def make_shell_context():
@@ -30,7 +30,7 @@ def make_shell_context():
 @app.cli.command()
 def test():
     """Runs the unit test."""
-    test = unittest.TestLoader().discover('project/test', pattern='test*.py')
+    test = unittest.TestLoader().discover('project/test', pattern='test_*.py')
     result = unittest.TextTestRunner(verbosity=2).run(test)
     if result.wasSuccessful():
         return 0
@@ -47,9 +47,9 @@ def cov():
         print('Coverage Summary:')
         COV.report()
         covdir = Path.cwd() / 'tmp' / 'coverage'
-        print(f'coverage-directory:- {str(covdir)}')
+        # print(f'coverage-directory:- {str(covdir)}')
         # COV.html_report(directory=covdir)
-        print('HTML version: file://%s/index.html' % covdir)
+        # print('HTML version: file://%s/index.html' % covdir)
         COV.erase()
         return 0
     return 1

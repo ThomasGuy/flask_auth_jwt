@@ -37,6 +37,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name
+    FLASK_ENV='production'
 
 
 config_name = {
