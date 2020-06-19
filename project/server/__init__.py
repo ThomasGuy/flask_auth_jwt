@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 from project.database import init_db, db_scoped_session, flask_bcrypt
 from project.server.util.blacklist_helpers import is_token_revoked
@@ -12,10 +13,12 @@ def create_app(Config):
     jwt.init_app(app)
     flask_bcrypt.init_app(app)
     engine = init_db(app.config.get('SQLALCHEMY_DATABASE_URI'))
+    CORS(app)
 
     with app.app_context():
-        from project.server.controllers import auth_blueprint
+        from project.server.controllers import auth_blueprint, api_blueprint
         app.register_blueprint(auth_blueprint)
+        app.register_blueprint(api_blueprint)
 
         # Using the expired_token_loader decorator, we will now call
         # this function whenever an expired but otherwise valid access

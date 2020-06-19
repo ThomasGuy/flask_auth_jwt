@@ -6,8 +6,11 @@ from .logout import LogoutAPI
 from .refresh import RefreshToken
 from .userAPI import UserAPI
 from .protected import ProtectedAPI
+from .bfxAPI import BfxAPI
+
 
 auth_blueprint = Blueprint('auth', __name__)
+api_blueprint = Blueprint('api', __name__)
 
 registration_view = RegisterAPI.as_view('register_api')
 login_view = LoginAPI.as_view('login_api')
@@ -15,6 +18,8 @@ logout_view = LogoutAPI.as_view('logout_api')
 refresh_view = RefreshToken.as_view('refresh_api')
 user_status_view = UserAPI.as_view('user_api')
 protected_view = ProtectedAPI.as_view('protected_api')
+
+bfx_view = BfxAPI.as_view('ticker_prices')
 
 auth_blueprint.add_url_rule(
     '/auth/register',
@@ -47,4 +52,9 @@ auth_blueprint.add_url_rule(
     '/protected',
     view_func=protected_view,
     methods=['GET']
+)
+api_blueprint.add_url_rule(
+    '/api/tickers',
+    view_func=bfx_view,
+    methods=['GET', 'POST']
 )

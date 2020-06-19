@@ -7,21 +7,13 @@ import coverage
 from pathlib import Path
 
 from project.server import create_app
+from project.server.bitfinex.bfx import bfx
 from project.database import db_scoped_session as db, Base, init_db
 from project.database.models import User
 
+bfx.ws.run()
+app, engine = create_app("config.DevelopmentConfig")
 
-COV = coverage.coverage(
-    branch=True,
-    include='project/*',
-    omit=[
-        'project/test/*',
-        'project/server/*/__init__.py'
-    ]
-)
-COV.start()
-
-app, engine = create_app("config.ProductionConfig")
 
 @app.shell_context_processor
 def make_shell_context():
@@ -33,24 +25,6 @@ def test():
     test = unittest.TestLoader().discover('project/test', pattern='test_*.py')
     result = unittest.TextTestRunner(verbosity=2).run(test)
     if result.wasSuccessful():
-        return 0
-    return 1
-
-@app.cli.command()
-def cov():
-    """Runs the unit tests with coverage."""
-    test = unittest.TestLoader().discover('project/test', pattern='test_*.py')
-    result = unittest.TextTestRunner(verbosity=2).run(test)
-    if result.wasSuccessful():
-        COV.stop()
-        COV.save()
-        print('Coverage Summary:')
-        COV.report()
-        covdir = Path.cwd() / 'tmp' / 'coverage'
-        # print(f'coverage-directory:- {str(covdir)}')
-        # COV.html_report(directory=covdir)
-        # print('HTML version: file://%s/index.html' % covdir)
-        COV.erase()
         return 0
     return 1
 
