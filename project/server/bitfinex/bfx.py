@@ -20,7 +20,7 @@ API_SECRET = os.getenv('BFX_SECRET')
 symbols = ['BTC', 'BCH', 'BSV', 'BTG', 'DSH', 'EOS', 'ETC', 'ETH', 'ETP', 'IOT',
            'LTC', 'NEO', 'OMG', 'SAN', 'TRX', 'XLM', 'XMR', 'XRP', 'XTZ', 'ZEC', 'ZRX']
 
-sym2 = ['BTC', 'ETH', 'XRP', 'LTC', 'NEO', 'BSV', 'EOS', 'ETC', 'XMR', 'XLM', 'ZEC']
+sym2 = ['BTC', 'ETH', 'XRP', 'LTC', 'NEO', 'BSV', 'EOS', 'ETC']
 small = ['BTC', 'ETH', 'XRP', 'LTC']
 tickerDataFields = ['daily_change', 'daily_change_percent', 'last_price',
                     'volume', 'high', 'low']

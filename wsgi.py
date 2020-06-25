@@ -9,7 +9,7 @@ from pathlib import Path
 from project.server import create_app
 from project.server.bitfinex.bfx import bfx
 from project.database import db_scoped_session as db, Base, init_db
-from project.database.models import User
+from project.database.models import User, Blacklist
 
 bfx.ws.run()
 app, engine = create_app("config.DevelopmentConfig")
@@ -17,7 +17,7 @@ app, engine = create_app("config.DevelopmentConfig")
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(app=app, db=db, User=User)
+    return dict(app=app, db=db, User=User, Blacklist=Blacklist)
 
 @app.cli.command()
 def test():
