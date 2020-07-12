@@ -13,11 +13,12 @@ from ..bitfinex.bfx import vault
 
 class BfxAPI(views.MethodView):
     """ Bitfinex API """
-    # decorators = [jwt_required]
+    decorators = [jwt_required]
 
     def get(self):
         tickerData = []
-        for ticker in vault:
+        for ticker in vault.values():
+            tickerData.append(asdict(ticker))
 
         if tickerData:
             response = {
@@ -30,22 +31,19 @@ class BfxAPI(views.MethodView):
         else:
             response = {
                 'status': 'fail',
-                'data': tickerData
+                'message': 'Server error'
             }
 
             return make_response(jsonify(response)), 500
 
     def post(self):
         post_data = request.get_json()
-        tickerData = []
-        for ticker in vault:
-            if (ticker.symbol in postdata['data']):
-                tickerData.append(asdict(ticker))
+        ticker = vault[post_data['data']]
 
-        if tickerData:
+        if ticker:
             response = {
                 'status': 'success',
-                'data': tickerData
+                'data': asdict(ticker)
             }
 
             return make_response(jsonify(response)), 200
@@ -53,7 +51,7 @@ class BfxAPI(views.MethodView):
         else:
             response = {
                 'status': 'fail',
-                'data': tickerData
+                'message': 'No such ticker'
             }
 
             return make_response(jsonify(response)), 500

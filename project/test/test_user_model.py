@@ -17,17 +17,17 @@ class TestUserModel(BaseTestCase):
         user = User(
             public_id=public_id,
             email='test@test.com',
-            password='test',
-            username='testies',
+            password='testpw',
+            username='jonny',
             registered_on=datetime.datetime.utcnow()
         )
         db.add(user)
         db.commit()
-        auth_token = create_access_token(identity=user.username)
-        self.assertTrue(User.authenticate( 'test', public_id=public_id))
-        self.assertTrue(User.authenticate( 'test', username='testies'))
-        self.assertTrue(User.authenticate( 'test', email='test@test.com'))
-        self.assertTrue(user.check_password('test'))
+        auth_token = create_access_token(identity=user.public_id)
+        self.assertTrue(User.authenticate( 'testpw', public_id=public_id))
+        self.assertTrue(User.authenticate( 'testpw', username='jonny'))
+        self.assertTrue(User.authenticate( 'testpw', email='test@test.com'))
+        self.assertTrue(user.check_password('testpw'))
         self.assertTrue(decode_token(auth_token)) == user.username
 
 

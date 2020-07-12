@@ -19,7 +19,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -56,7 +55,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user( username='bobby', email='joe@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue( data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -64,7 +62,6 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.login_user( username='bobby', email=None, password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['message'] == 'Successfully logged in.')
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
@@ -76,7 +73,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user( username='joeseph', email='joeyboy33@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue( data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -84,7 +80,6 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.login_user( username=None, email='joeyboy33@gmail.com', password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['message'] == 'Successfully logged in.')
             self.assertTrue(data['auth_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
@@ -97,7 +92,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data['status'] == 'fail')
             self.assertTrue(data['message'] == 'User does not exist.')
             self.assertTrue(response.content_type == 'application/json')
-            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.status_code, 202)
 
     def test_incorrect_password_user_login(self):
         """ Test - login with incorrect password """
@@ -106,7 +101,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue( data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -114,9 +108,9 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.login_user(username='joeseph', email='joe@gmail.com', password='wrongpasswd')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'fail')
-            self.assertTrue(data['message'] == 'Password is incorrect.')
+            self.assertTrue(data['message'] == 'User does not exist.')
             self.assertTrue(response.content_type == 'application/json')
-            self.assertEqual(response.status_code, 401)
+            self.assertEqual(response.status_code, 202)
 
     def test_valid_logout(self):
         """ Test - logout before token expires """
@@ -125,7 +119,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -133,12 +126,11 @@ class TestAuthBlueprint(BaseTestCase):
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
             self.assertTrue(data_login['auth_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
             # valid token logout
-            response = self.client.post(
+            response = self.client.get(
                 '/auth/logout',
                 headers=dict(
                     Authorization='Bearer ' + data_login['auth_token']
@@ -147,7 +139,6 @@ class TestAuthBlueprint(BaseTestCase):
             data = json.loads(response.data.decode())
             # print(f'data: {data}')
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['message'] == 'Successfully logged out.')
             self.assertEqual(response.status_code, 200)
 
     def test_invalid_logout(self):
@@ -157,7 +148,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -165,13 +155,12 @@ class TestAuthBlueprint(BaseTestCase):
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
             self.assertTrue(data_login['auth_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
             # invalid token logout
             time.sleep(6)
-            response = self.client.post(
+            response = self.client.get(
                 '/auth/logout',
                 headers=dict(
                     Authorization='Bearer ' + data_login['auth_token']
@@ -188,14 +177,12 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user(username='Thomas', email='tom@mail.box', password='ahoy')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue( data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             resp_login = self.login_user(username='Thomas', email='', password='ahoy')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
             self.assertTrue(data_login['auth_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
@@ -207,7 +194,6 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['message'] == 'You are authorized.')
             self.assertTrue(data is not None)
             self.assertTrue(isinstance(data['get_current_user'], dict))
             # self.assertTrue(data['current_user']['admin'] == 'true' or 'false')
@@ -223,7 +209,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user(username='Tom')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -231,7 +216,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_login = self.login_user(username='Tom', email=None, password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
             self.assertTrue(data_login['auth_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
@@ -257,7 +241,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['message'] == 'Successfully registered.')
             self.assertTrue(data_register['auth_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
@@ -265,7 +248,6 @@ class TestAuthBlueprint(BaseTestCase):
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['message'] == 'Successfully logged in.')
             self.assertTrue(data_login['auth_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             # self.assertEqual(resp_login.status_code, 200)
@@ -274,7 +256,7 @@ class TestAuthBlueprint(BaseTestCase):
             token = Blacklist.query.filter_by(jti=jti).first()
             token.revoked = True
             db.commit()
-            response = self.client.post(
+            response = self.client.get(
                 '/auth/logout',
                 headers=dict(
                     Authorization='Bearer ' + data_login['auth_token']

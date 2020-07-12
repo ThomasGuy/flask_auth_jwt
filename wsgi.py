@@ -10,6 +10,7 @@ from project.server import create_app
 from project.server.bitfinex.bfx import bfx
 from project.database import db_scoped_session as db, Base, init_db
 from project.database.models import User, Blacklist
+from project.server.util.blacklist_helpers import prune_database
 
 bfx.ws.run()
 app, engine = create_app("config.DevelopmentConfig")
@@ -44,3 +45,8 @@ def drop():
 def create_db():
     """ Creates the db tables if they don't already exist """
     init_db(app.config['SQLALCHEMY_DATABASE_URI'])
+
+@app.cli.command()
+def prune_db():
+    """ Prune all expired tokens from blacklist db """
+    prune_database()

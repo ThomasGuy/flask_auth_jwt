@@ -25,7 +25,8 @@ small = ['BTC', 'ETH', 'XRP', 'LTC']
 tickerDataFields = ['daily_change', 'daily_change_percent', 'last_price',
                     'volume', 'high', 'low']
 
-vault = TickerBank()  # Ticker dataclass instamces in the TickerBank vault
+# vault = TickerBank()  # Ticker dataclass instamces in the TickerBank vault
+vault = {}
 
 bfx = Client(
     # API_KEY=API_KEY,
@@ -43,9 +44,8 @@ def log_error(msg):
 @bfx.ws.on('subscribed')
 def show_channel(sub):
     symbol = sub.symbol[1:]
-    if not vault.getTicker(symbol):
-        vault.append(Ticker(symbol=symbol))
-        log.info(f"{symbol} subscribed - added to vault, size = {len(vault)}")
+    vault[symbol] = Ticker(symbol=symbol)
+    log.info(f"{symbol} subscribed - added to vault, size = {len(vault)}")
 
 
 @bfx.ws.on('all')
@@ -58,7 +58,7 @@ def bfxws_data_handler(data):
             sub = bfx.ws.subscriptionManager.get(chan_id)
             if sub.channel_name == 'ticker':
                 updates = dict(zip(tickerDataFields, dataEvent[4:]))
-                vault.getTicker(sub.symbol[1:])._update(**updates)
+                vault[sub.symbol[1:]]._update(**updates)
 
                 # payload = {
                 #     'symbol': sub.symbol[1:],

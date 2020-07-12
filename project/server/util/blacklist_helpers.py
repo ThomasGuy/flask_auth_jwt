@@ -100,3 +100,4 @@ def prune_database():
     for token in expired:
         db.delete(token)
     db.commit()
+    # print(len(expired),' entries deleted')

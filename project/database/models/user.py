@@ -35,7 +35,7 @@ class User(Base):
 
     # using class method here since we will be invoking this using User.authenticate()
     @staticmethod
-    def authenticate(password, username=None, email= None, public_id=None):
+    def authenticate(password=None, username=None, email= None, public_id=None):
         found_user = User.query.filter(or_(
                 User.username==username,
                 User.email==email,
@@ -44,7 +44,7 @@ class User(Base):
 
         if found_user:
             if flask_bcrypt.check_password_hash(found_user.password_hash, password):
-                return found_user # make sure to return the user so we can log them in by storing information in the session
+                return found_user
         return False
 
     def to_dict(self):

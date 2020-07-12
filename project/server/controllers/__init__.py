@@ -34,12 +34,12 @@ auth_blueprint.add_url_rule(
 auth_blueprint.add_url_rule(
     '/auth/logout',
     view_func=logout_view,
-    methods=['POST']
+    methods=['GET']
 )
 auth_blueprint.add_url_rule(
     '/auth/refresh',
     view_func=refresh_view,
-    methods=['POST']
+    methods=['GET']
 )
 auth_blueprint.add_url_rule(
     '/auth/status',

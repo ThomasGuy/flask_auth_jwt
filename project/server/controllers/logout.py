@@ -10,7 +10,7 @@ from project.database import db_scoped_session
 class LogoutAPI(views.MethodView):
     """ logout """
     decorators = [jwt_required]
-    def post(self):
+    def get(self):
         jti = get_raw_jwt()['jti']
         try:
             token = Blacklist.query.filter_by(jti=jti).first()
@@ -18,13 +18,11 @@ class LogoutAPI(views.MethodView):
             db_scoped_session.commit()
             responseObject = {
                 'status': 'success',
-                'message': 'Successfully logged out.'
             }
             return make_response(jsonify(responseObject)), 200
         except Exception as e:
             responseObject = {
                 'status': 'fail',
-                'message': e
+                'message': e.message
             }
-            return make_response(jsonify(responseObject)), 201
-
+            return make_response(jsonify(responseObject)), 500

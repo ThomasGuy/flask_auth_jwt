@@ -8,9 +8,10 @@ from flask_jwt_extended import (
 class RefreshToken(views.MethodView):
     """ refresh access token """
     decorators = [jwt_refresh_token_required]
-    def post(self):
-        current_user = get_jwt_identity()
+    def get(self):
+        user_id = get_jwt_identity()
         response = {
-            'access_token': create_access_token(identity=current_user)
+            'access_token': create_access_token(identity=user_id)
         }
-        return make_response(jsonify(response)), 200
+        # return make_response(jsonify(response)), 200
+        return jsonify(response), 200

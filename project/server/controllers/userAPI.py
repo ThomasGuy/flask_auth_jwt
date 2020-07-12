@@ -28,7 +28,6 @@ class UserAPI(views.MethodView):
         if auth_token:
             responseObject = {
                 'status': 'success',
-                'message': 'You are authorized.',
                 'get_current_user': get_current_user(),
                 'name': current_user.get('username')
             }

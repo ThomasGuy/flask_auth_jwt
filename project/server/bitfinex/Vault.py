@@ -27,3 +27,11 @@ class TickerBank(list):
             if symbol in ticker.symbol:
                 return ticker
         return None
+
+
+class TickerDict(dict):
+    ''' Dictionary of ticker objects
+        key: symbol
+        value: Ticker - dataclass
+    '''
+    pass

@@ -37,7 +37,6 @@ class RegisterAPI(MethodView):
                 access_token = create_access_token(identity=user.public_id)
                 responseObject = {
                     'status': 'success',
-                    'message': 'Successfully registered.',
                     'auth_token': access_token
                 }
                 return make_response(jsonify(responseObject)), 201
