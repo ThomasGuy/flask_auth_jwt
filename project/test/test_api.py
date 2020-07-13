@@ -21,20 +21,20 @@ class TestApiBlueprint(BaseTestCase):
             resp_register =self.register_user( username='joeseph', email='joeyboy33@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # registered user login
             response = self.login_user( username=None, email='joeyboy33@gmail.com', password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['auth_token'])
+            self.assertTrue(data['access_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
 
             api_response = self.client.get(
                 '/api/tickers',
-                headers=dict(Authorization='Bearer ' + data['auth_token']),
+                headers=dict(Authorization='Bearer ' + data['access_token']),
                 # data=json.dumps(dict(
                 #     coin='BTC'
                 # )),

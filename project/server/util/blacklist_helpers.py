@@ -16,7 +16,7 @@ def _epoch_utc_to_datetime(epoch_utc):
     return datetime.fromtimestamp(epoch_utc)
 
 
-def add_token_to_database(encoded_token, identity_claim):
+def add_token_to_database(encoded_token, identity_claim=None): # changed identity_claim to a kwarg
     """
     Adds a new token to the database. It is not revoked when it is added.
     :param identity_claim:
@@ -24,7 +24,8 @@ def add_token_to_database(encoded_token, identity_claim):
     decoded_token = decode_token(encoded_token)
     jti = decoded_token['jti']
     token_type = decoded_token['type']
-    user_identity = decoded_token[identity_claim]
+    # user_identity = decoded_token[identity_claim] # this is the original line ??
+    user_identity = decoded_token['identity']
     expires = _epoch_utc_to_datetime(decoded_token['exp'])
     revoked = False
 
@@ -100,4 +101,4 @@ def prune_database():
     for token in expired:
         db.delete(token)
     db.commit()
-    # print(len(expired),' entries deleted')
+    print(len(expired),' entries deleted')

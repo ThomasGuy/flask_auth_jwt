@@ -4,11 +4,12 @@ import time
 import uuid
 import datetime
 
-from flask_jwt_extended import decode_token
+from flask_jwt_extended import decode_token, get_jwt_identity
 
 from project.database import db_scoped_session as db
 from project.database.models import User, Blacklist
 from project.test.base import BaseTestCase
+from project.server.util.blacklist_helpers import is_token_revoked
 
 
 class TestAuthBlueprint(BaseTestCase):
@@ -19,7 +20,7 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
 
@@ -55,14 +56,14 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user( username='bobby', email='joe@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # registered user login
             response = self.login_user( username='bobby', email=None, password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['auth_token'])
+            self.assertTrue(data['access_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
 
@@ -73,14 +74,14 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user( username='joeseph', email='joeyboy33@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # registered user login
             response = self.login_user( username=None, email='joeyboy33@gmail.com', password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
-            self.assertTrue(data['auth_token'])
+            self.assertTrue(data['access_token'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 201)
 
@@ -101,7 +102,7 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # user login with wrong password
@@ -119,21 +120,21 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register =self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # user login
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['auth_token'])
+            self.assertTrue(data_login['access_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
             # valid token logout
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authorization='Bearer ' + data_login['auth_token']
+                    Authorization='Bearer ' + data_login['access_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -148,14 +149,14 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # user login
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['auth_token'])
+            self.assertTrue(data_login['access_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
             # invalid token logout
@@ -163,13 +164,60 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authorization='Bearer ' + data_login['auth_token']
+                    Authorization='Bearer ' + data_login['access_token']
                 )
             )
             data = json.loads(response.data.decode())
             self.assertTrue(data['sub_status'] == 42)
-            self.assertTrue(data['msg'] == 'The access token has expired')
+            self.assertTrue(data['message'] == 'The access token has expired')
             self.assertEqual(response.status_code, 401)
+
+    def test_refresh_expired_token(self):
+        """ Test - refreah expired token and access protected endpoint """
+        with self.client:
+            # user registration
+            resp_register = self.register_user()
+            data_register = json.loads(resp_register.data.decode())
+            self.assertTrue(data_register['access_token'])
+            self.assertEqual(resp_register.status_code, 201)
+            # user login
+            resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
+            data_login = json.loads(resp_login.data.decode())
+            self.assertTrue(data_login['access_token'])
+            self.assertTrue(data_login['refresh_token'])
+            self.assertEqual(resp_login.status_code, 201)
+            # invalid token
+            time.sleep(6)
+            response = self.client.get(
+                '/protected',
+                headers=dict(
+                    Authorization='Bearer ' + data_login['access_token']
+                )
+            )
+            data = json.loads(response.data.decode())
+            self.assertTrue(data['sub_status'] == 42)
+            self.assertTrue(data['message'] == 'The access token has expired')
+            self.assertEqual(response.status_code, 401)
+            # get refresh access token
+            refresh_response = self.client.get(
+                '/auth/refresh',
+                headers=dict(
+                    Authorization='Bearer ' + data_login['refresh_token']
+                )
+            )
+            data_refresh = json.loads(refresh_response.data.decode())
+            self.assertTrue(data_refresh['access_token'])
+            print('Access token', decode_token(data_refresh['access_token']))
+            print('id ', get_jwt_identity())
+            self.assertFalse(is_token_revoked(decode_token(data_refresh['access_token'])))
+            response = self.client.get(
+                '/protected',
+                headers=dict(
+                    Authorization='Bearer ' + data_refresh['access_token']
+                )
+            )
+            data_final = json.loads(response.data.decode())
+            # print('\nfinal response ', data_final)
 
     def test_user_status(self):
         """ Test - user status """
@@ -177,19 +225,19 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user(username='Thomas', email='tom@mail.box', password='ahoy')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             resp_login = self.login_user(username='Thomas', email='', password='ahoy')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['auth_token'])
+            self.assertTrue(data_login['access_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
             response = self.client.post(
                 '/auth/status',
                 headers=dict(
-                    Authorization='Bearer ' + data_login['auth_token']
+                    Authorization='Bearer ' + data_login['access_token']
                 )
             )
             data = json.loads(response.data.decode())
@@ -199,8 +247,7 @@ class TestAuthBlueprint(BaseTestCase):
             # self.assertTrue(data['current_user']['admin'] == 'true' or 'false')
             self.assertEqual(response.status_code, 200)
             print(f'get_current_user {data["get_current_user"]}')
-            print(data['get_current_user']['admin'])
-            print('name:- ', data.get('name'))
+            print('token identity: ', decode_token(data_login['access_token'])['identity'])
 
     def test_using_revoked_access_token(self):
         """ Test - using revoked access token """
@@ -209,29 +256,29 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user(username='Tom')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # user login
             resp_login = self.login_user(username='Tom', email=None, password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['auth_token'])
+            self.assertTrue(data_login['access_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             self.assertEqual(resp_login.status_code, 201)
-            jti = decode_token(data_login['auth_token'])['jti']
+            jti = decode_token(data_login['access_token'])['jti']
             token = Blacklist.query.filter_by(jti=jti).first()
             token.revoked = True
             db.commit()
             response = self.client.get(
                 '/auth/status',
                 headers=dict(
-                    Authorization='Bearer ' + data_login['auth_token']
+                    Authorization='Bearer ' + data_login['access_token']
                 )
             )
             data = json.loads(response.data.decode())
             print('data: ', data)
-            self.assertTrue(data['msg'] == 'Token has been revoked')
+            self.assertTrue(data['message'] == 'Token has been revoked')
 
 
     def test_valid_blacklisted_token_logout(self):
@@ -241,30 +288,30 @@ class TestAuthBlueprint(BaseTestCase):
             resp_register = self.register_user()
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
-            self.assertTrue(data_register['auth_token'])
+            self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # user login
             resp_login = self.login_user(username='joeseph', email='joe@gmail.com', password='123456')
             data_login = json.loads(resp_login.data.decode())
             self.assertTrue(data_login['status'] == 'success')
-            self.assertTrue(data_login['auth_token'])
+            self.assertTrue(data_login['access_token'])
             self.assertTrue(resp_login.content_type == 'application/json')
             # self.assertEqual(resp_login.status_code, 200)
             # blacklist a valid token
-            jti = decode_token(data_login['auth_token'])['jti']
+            jti = decode_token(data_login['access_token'])['jti']
             token = Blacklist.query.filter_by(jti=jti).first()
             token.revoked = True
             db.commit()
             response = self.client.get(
                 '/auth/logout',
                 headers=dict(
-                    Authorization='Bearer ' + data_login['auth_token']
+                    Authorization='Bearer ' + data_login['access_token']
                 )
             )
             data = json.loads(response.data.decode())
             print(data)
-            self.assertTrue(data['msg'] == 'Token has been revoked')
+            self.assertTrue(data['message'] == 'Token has been revoked')
             self.assertEqual(response.status_code, 401)
 
 

@@ -23,12 +23,12 @@ class TestUserModel(BaseTestCase):
         )
         db.add(user)
         db.commit()
-        auth_token = create_access_token(identity=user.public_id)
+        access_token = create_access_token(identity=user.public_id)
         self.assertTrue(User.authenticate( 'testpw', public_id=public_id))
         self.assertTrue(User.authenticate( 'testpw', username='jonny'))
         self.assertTrue(User.authenticate( 'testpw', email='test@test.com'))
         self.assertTrue(user.check_password('testpw'))
-        self.assertTrue(decode_token(auth_token)) == user.username
+        self.assertTrue(decode_token(access_token)) == user.username
 
 
 if __name__ == '__main__':

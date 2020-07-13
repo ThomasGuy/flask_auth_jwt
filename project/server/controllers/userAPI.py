@@ -15,7 +15,7 @@ class UserAPI(views.MethodView):
         auth_header = request.headers.get('Authorization')
         if auth_header:
             try:
-                auth_token = auth_header.split(" ")[1]
+                access_token = auth_header.split(" ")[1]
             except IndexError:
                 responseObject = {
                     'status': 'fail',
@@ -23,9 +23,9 @@ class UserAPI(views.MethodView):
                 }
                 return make_response(jsonify(responseObject)), 401
         else:
-            auth_token = ''
+            access_token = ''
 
-        if auth_token:
+        if access_token:
             responseObject = {
                 'status': 'success',
                 'get_current_user': get_current_user(),

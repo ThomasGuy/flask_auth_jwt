@@ -37,8 +37,8 @@ bfx = Client(
     )
 
 @bfx.ws.on('error')
-def log_error(msg):
-    log.error(msg)
+def log_error(message):
+    log.error(message)
 
 
 @bfx.ws.on('subscribed')
