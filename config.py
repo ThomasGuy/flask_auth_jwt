@@ -18,13 +18,14 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_precious_secret_key')
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    JWT_ERROR_MESSAGE_KEY = 'message'
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name
-    JWT_ACCESS_TOKEN_EXPIRES = 10 # seconds
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=10) # seconds
+    JWT_ACCESS_TOKEN_EXPIRES = 7
+    JWT_REFRESH_TOKEN_EXPIRES = 35 # seconds
 
 class TestingConfig(Config):
     DEBUG = True
@@ -32,7 +33,7 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name + '_test'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     JWT_ACCESS_TOKEN_EXPIRES = 5 # seconds
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=30) # seconds
+    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=2) # seconds
 
 
 class ProductionConfig(Config):

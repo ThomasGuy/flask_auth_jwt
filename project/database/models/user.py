@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 # third  party imports
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, or_
@@ -12,11 +13,11 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(255), unique=True, nullable=False)
-    registered_on = Column(DateTime, nullable=False)
-    admin = Column(Boolean, nullable=False, default=False)
-    public_id = Column(String(100), unique=True)
     username = Column(String(50), unique=True)
+    email = Column(String(255), unique=True, nullable=False)
+    public_id = Column(String(100), default=str(uuid.uuid4()))
+    registered_on = Column(DateTime, default=datetime.datetime.utcnow())
+    admin = Column(Boolean, nullable=False, default=False)
     password_hash = Column(String(100))
 
     @property
@@ -33,9 +34,10 @@ class User(Base):
     def __repr__(self):
         return "<User '{}'>".format(self.username)
 
-    # using class method here since we will be invoking this using User.authenticate()
+
     @staticmethod
     def authenticate(password=None, username=None, email= None, public_id=None):
+        ''' must pass password and at least one other kwarg '''
         found_user = User.query.filter(or_(
                 User.username==username,
                 User.email==email,

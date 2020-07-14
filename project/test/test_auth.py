@@ -23,6 +23,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
+            self.assertFalse(is_token_revoked(decode_token(data_register['access_token'])))
 
     def test_registered_with_already_registered_user(self):
         """ Test - registration with already registered username/email """
@@ -173,7 +174,7 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 401)
 
     def test_refresh_expired_token(self):
-        """ Test - refreah expired token and access protected endpoint """
+        """ Test - refresh expired token and access protected endpoint """
         with self.client:
             # user registration
             resp_register = self.register_user()
@@ -207,8 +208,6 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data_refresh = json.loads(refresh_response.data.decode())
             self.assertTrue(data_refresh['access_token'])
-            print('Access token', decode_token(data_refresh['access_token']))
-            print('id ', get_jwt_identity())
             self.assertFalse(is_token_revoked(decode_token(data_refresh['access_token'])))
             response = self.client.get(
                 '/protected',
@@ -217,7 +216,8 @@ class TestAuthBlueprint(BaseTestCase):
                 )
             )
             data_final = json.loads(response.data.decode())
-            # print('\nfinal response ', data_final)
+            self.assertEqual(response.status_code, 200)
+
 
     def test_user_status(self):
         """ Test - user status """

@@ -5,6 +5,7 @@ import unittest
 import click
 import coverage
 from pathlib import Path
+import gunicorn
 
 from project.server import create_app
 from project.server.bitfinex.bfx import bfx
@@ -14,6 +15,12 @@ from project.server.util.blacklist_helpers import prune_database
 
 bfx.ws.run()
 app, engine = create_app("config.DevelopmentConfig")
+
+
+# @app.cli.command()
+# def start():
+#     gunicorn --bind localhost:8080 wsgi:app
+
 
 
 @app.shell_context_processor
@@ -48,5 +55,5 @@ def create_db():
 
 @app.cli.command()
 def prune_db():
-    """ Prune all expired tokens from blacklist db """
+    """ Remove all expired tokens from blacklist db """
     prune_database()

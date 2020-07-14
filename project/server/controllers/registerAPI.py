@@ -9,6 +9,7 @@ from flask_jwt_extended import create_access_token
 
 from project.database.models import User
 from project.database import db_scoped_session as db
+from project.server.util.blacklist_helpers import add_token_to_database
 
 class RegisterAPI(MethodView):
     """ User Registration Resource """
@@ -23,11 +24,9 @@ class RegisterAPI(MethodView):
         if user is None:
             try:
                 user = User(
-                    public_id=str(uuid.uuid4()),
                     username=post_data.get('username'),
                     email=post_data.get('email'),
-                    password=post_data.get('password'),
-                    registered_on=datetime.datetime.utcnow()
+                    password=post_data.get('password')
                 )
 
                 # insert the user
@@ -35,6 +34,7 @@ class RegisterAPI(MethodView):
                 db.commit()
                 # generate the auth token
                 access_token = create_access_token(identity=user.public_id)
+                add_token_to_database(access_token)
                 responseObject = {
                     'status': 'success',
                     'access_token': access_token
