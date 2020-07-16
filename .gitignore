@@ -4,6 +4,6 @@ deploy.log
 venv
 
 *.pyc
-tmp/
+tmp
 *.log
 .coverage
