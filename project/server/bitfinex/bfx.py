@@ -4,12 +4,13 @@
 import logging
 import os
 import json
+import asyncio
 
 # 3rd party imports
 from bfxapi import Client
 
 # package imports
-# from server.events import sockio
+from project.server.services.events import sockio
 from .Vault import Ticker, TickerBank
 
 
@@ -20,13 +21,14 @@ API_SECRET = os.getenv('BFX_SECRET')
 symbols = ['BTC', 'BCH', 'BSV', 'BTG', 'DSH', 'EOS', 'ETC', 'ETH', 'ETP', 'IOT',
            'LTC', 'NEO', 'OMG', 'SAN', 'TRX', 'XLM', 'XMR', 'XRP', 'XTZ', 'ZEC', 'ZRX']
 
-sym2 = ['BTC', 'ETH', 'XRP', 'LTC', 'NEO', 'BSV', 'EOS', 'ETC']
+sym2 = ['BTC', 'ETH', 'XRP', 'LTC', 'NEO', 'BSV', 'EOS', 'ETC', 'XMR', 'XTZ']
 small = ['BTC', 'ETH', 'XRP', 'LTC']
-tickerDataFields = ['daily_change', 'daily_change_percent', 'last_price',
+tickerDataFields = ['daily_change', 'daily_change_relative', 'last_price',
                     'volume', 'high', 'low']
 
 # vault = TickerBank()  # Ticker dataclass instamces in the TickerBank vault
 vault = {}
+
 
 bfx = Client(
     # API_KEY=API_KEY,
@@ -57,22 +59,18 @@ def bfxws_data_handler(data):
         if type(dataEvent) is not str and bfx.ws.subscriptionManager.is_subscribed(chan_id):
             sub = bfx.ws.subscriptionManager.get(chan_id)
             if sub.channel_name == 'ticker':
-                updates = dict(zip(tickerDataFields, dataEvent[4:]))
-                vault[sub.symbol[1:]]._update(**updates)
+                update = dict(zip(tickerDataFields, dataEvent[4:]))
+                vault[sub.symbol[1:]]._update(**update)
 
-                # payload = {
-                #     'symbol': sub.symbol[1:],
-                #     'data': dataEvent[4:],
-                #     }
-                # sockio.emit('ticker event', json.dumps(payload), namespace='/main', broadcast=True)
-                log.debug(f'{sub.symbol} - ticker event')
+                update['symbol'] = sub.symbol[1:]
+
+                payload = {
+                    'data': update,
+                    }
+                sockio.emit('ticker_update', json.dumps(update), namespace='/api', broadcast=True)
+                # log.debug(f'{sub.symbol} - ticker event')
     else:
         log.info(f'bfx-info: {data}')
-
-# @bfx.ws.on ('new_ticker')
-# def update_ticker(data):
-#     log.info(f'tick_update: {data}')
-    #            tick_update: Ticker 'tETHUSD' <last='173.63029311' volume=55517.73711568>
 
 async def start():
     await bfx.ws.subscribe('ticker', 'tBTCUSD')

@@ -12,16 +12,9 @@ from project.server.bitfinex.bfx import bfx
 from project.database import db_scoped_session as db, Base, init_db
 from project.database.models import User, Blacklist
 from project.server.util.blacklist_helpers import prune_database
+from project.server.services.events import sockio
 
-bfx.ws.run()
 app, engine = create_app("config.DevelopmentConfig")
-
-
-# @app.cli.command()
-# def start():
-#     gunicorn --bind localhost:8080 wsgi:app
-
-
 
 @app.shell_context_processor
 def make_shell_context():
@@ -57,3 +50,8 @@ def create_db():
 def prune_db():
     """ Remove all expired tokens from blacklist db """
     prune_database()
+
+
+if __name__ == "__main__":
+    bfx.ws.run()
+    sockio.run(app, host='localhost', port=8000)

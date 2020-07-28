@@ -1,5 +1,5 @@
-# OAuth2 Authentication with flask-jwt-extended
+# Authentication with flask-jwt-extended
 
-### Start development server
+Start development server
 
-#### gunicorn -b localhost:8080 wsgi:app
+gunicorn -b localhost:8000 wsgi:app

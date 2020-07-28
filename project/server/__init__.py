@@ -4,6 +4,7 @@ from flask_cors import CORS
 
 from project.database import init_db, db_scoped_session, flask_bcrypt
 from project.server.util.blacklist_helpers import is_token_revoked
+from project.server.services.events import sockio
 
 jwt = JWTManager()
 
@@ -13,6 +14,7 @@ def create_app(Config):
     jwt.init_app(app)
     flask_bcrypt.init_app(app)
     engine = init_db(app.config.get('SQLALCHEMY_DATABASE_URI'))
+    sockio.init_app(app, manage_session=False)
     CORS(app)
 
     with app.app_context():

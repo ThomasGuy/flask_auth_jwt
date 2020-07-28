@@ -7,7 +7,7 @@ class Ticker():
     '''Store ticker data in instance of'''
     symbol: str
     daily_change: float = -0.01
-    daily_change_percent: float = -0.01
+    daily_change_relative: float = -0.01
     last_price: float = -0.01   # latest ticker
     volume: float = -0.01
     high: float = -0.01
