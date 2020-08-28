@@ -13,7 +13,7 @@ from ..bitfinex.bfx import vault
 
 class BfxAPI(views.MethodView):
     """ Bitfinex API """
-    decorators = [jwt_required]
+    # decorators = [jwt_required]
 
     def get(self):
         tickerData = []

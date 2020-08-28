@@ -52,6 +52,6 @@ def prune_db():
     prune_database()
 
 
-if __name__ == "__main__":
-    bfx.ws.run()
-    sockio.run(app, host='localhost', port=8000)
+# if __name__ == "__main__":
+#     bfx.ws.run()
+#     sockio.run(app, host='localhost', port=8000)

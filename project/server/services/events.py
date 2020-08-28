@@ -26,9 +26,9 @@ def messsage_handler(msg):
     emit('my response', {'data': msg['data']})
 
 
-@sockio.on('ticker_update')
-def handle_ticker_update(json):
-    emit('ticker_update', json, namespace='/api')
+# @sockio.on('ticker_update')
+# def handle_ticker_update(json):
+#     emit('ticker_update', json)
 
 
 @sockio.on('event')

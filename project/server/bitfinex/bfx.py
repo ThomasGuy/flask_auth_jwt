@@ -61,13 +61,14 @@ def bfxws_data_handler(data):
             if sub.channel_name == 'ticker':
                 update = dict(zip(tickerDataFields, dataEvent[4:]))
                 vault[sub.symbol[1:]]._update(**update)
-
-                update['symbol'] = sub.symbol[1:]
+                update['symbol'] = str(sub.symbol[1:])
 
                 payload = {
-                    'data': update,
-                    }
-                sockio.emit('ticker_update', json.dumps(update), namespace='/api', broadcast=True)
+                    'symbol': str(sub.symbol[1:]),
+                    'data': update
+                }
+
+                sockio.emit('ticker_update', {'data': payload}, namespace='/api', broadcast=True)
                 # log.debug(f'{sub.symbol} - ticker event')
     else:
         log.info(f'bfx-info: {data}')

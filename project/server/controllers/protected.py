@@ -1,3 +1,5 @@
+import logging
+
 from flask import request,jsonify, make_response, views
 from flask_jwt_extended import (
     jwt_required,
@@ -6,10 +8,13 @@ from flask_jwt_extended import (
     get_current_user
     )
 
+log = logging.getLogger(__name__)
 
 class ProtectedAPI(views.MethodView):
     """ User Protected Resource """
     decorators = [jwt_required]
+
+    # log.info('test', request.json())
     def get(self):
         try:
             response_object = {
