@@ -13,8 +13,6 @@ log = logging.getLogger(__name__)
 class ProtectedAPI(views.MethodView):
     """ User Protected Resource """
     decorators = [jwt_required]
-
-    # log.info('test', request.json())
     def get(self):
         try:
             response_object = {

@@ -16,7 +16,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(app is None)
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5433/jwt_auth'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5432/jwt_auth'
         )
 
 
@@ -30,7 +30,7 @@ class TestTestingConfig(TestCase):
         self.assertFalse(app.config['JWT_SECRET_KEY'] == 'my_precious_secret_key')
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5433/jwt_auth_test'
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5432/jwt_auth_test'
         )
 
 

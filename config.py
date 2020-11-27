@@ -7,7 +7,7 @@ load_dotenv()
 
 db_name = 'jwt_auth'
 local_sqldb = 'sqlite:///' + str(Path.cwd()) +'/'
-postgres_local_base = os.getenv('DB_DATABASE', local_sqldb)
+postgres_local_base = os.getenv('PG_LOCAL', local_sqldb)
 
 
 class Config:
@@ -24,7 +24,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name
-    JWT_ACCESS_TOKEN_EXPIRES = 15*60
+    JWT_ACCESS_TOKEN_EXPIRES = 3*60
     JWT_REFRESH_TOKEN_EXPIRES = 3600*6 # seconds
 
 class TestingConfig(Config):

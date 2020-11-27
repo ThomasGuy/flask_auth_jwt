@@ -1,3 +1,4 @@
+import asyncio
 import os
 import uuid
 import datetime
@@ -15,6 +16,7 @@ from project.server.util.blacklist_helpers import prune_database
 from project.server.services.events import sockio
 
 app, engine = create_app("config.DevelopmentConfig")
+bfx.ws.run()
 
 @app.shell_context_processor
 def make_shell_context():
@@ -54,4 +56,4 @@ def prune_db():
 
 # if __name__ == "__main__":
 #     bfx.ws.run()
-#     sockio.run(app, host='localhost', port=8000)
+#     sockio.run(app, host='localhost', port=7000)

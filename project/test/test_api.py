@@ -41,8 +41,11 @@ class TestApiBlueprint(BaseTestCase):
                 content_type='application/json'
             )
             data = json.loads(api_response.data.decode())
-            for ticker in data['data']:
-                print(ticker['symbol'], ticker['last_price'])
             self.assertTrue(data['status'] == 'success')
+            if data['status'] == 'success':
+                for ticker in data['data']:
+                    print(ticker['symbol'], ticker['last_price'])
+            else:
+                print('data server fail')
             self.assertTrue(len(data['data']) > 0)
 

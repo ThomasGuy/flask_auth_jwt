@@ -30,6 +30,7 @@ tickerDataFields = ['daily_change', 'daily_change_relative', 'last_price',
 vault = {}
 
 
+
 bfx = Client(
     # API_KEY=API_KEY,
     # API_SECRET=API_SECRET,
