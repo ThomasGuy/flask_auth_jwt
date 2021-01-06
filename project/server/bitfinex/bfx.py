@@ -29,12 +29,10 @@ tickerDataFields = ['daily_change', 'daily_change_relative', 'last_price',
 # vault = TickerBank()  # Ticker dataclass instamces in the TickerBank vault
 vault = {}
 
-
-
 bfx = Client(
     # API_KEY=API_KEY,
     # API_SECRET=API_SECRET,
-    logLevel='INFO',
+    logLevel='ERROR',
     dead_man_switch=True,
     channel_filter=['ticker', 'candle'],
     )
