@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Ticker():
-    '''Store ticker data in instance of'''
+    '''Store ticker data in instance of Ticker dataclass'''
     symbol: str
     daily_change: float = -0.01
     daily_change_relative: float = -0.01
@@ -21,6 +21,7 @@ class Ticker():
 
 class TickerBank(list):
     ''' Contains all Ticker instances '''
+
     def getTicker(self, symbol):
         '''Return Ticker instance'''
         for ticker in self:

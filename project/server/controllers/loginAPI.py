@@ -1,7 +1,6 @@
+''' auth/login '''
 from flask import request, make_response, jsonify
-from flask import current_app as app
 from flask.views import MethodView
-from sqlalchemy import or_
 from flask_jwt_extended import create_access_token, create_refresh_token
 
 from project.server.util.blacklist_helpers import add_token_to_database
@@ -10,7 +9,9 @@ from project.database.models import User
 
 class LoginAPI(MethodView):
     """ User Login Resource """
+
     def post(self):
+        ''' validate user login '''
         # get the post data
         credentials = request.get_json()
         try:
@@ -34,7 +35,7 @@ class LoginAPI(MethodView):
                     'message': 'User does not exist.'
                 }
                 return make_response(jsonify(responseObject)), 202
-        except Exception as e:
+        except Exception:
 
             responseObject = {
                 'status': 'fail',

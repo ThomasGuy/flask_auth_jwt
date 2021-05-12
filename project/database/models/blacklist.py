@@ -1,4 +1,4 @@
-import datetime
+""" Blacklist """
 
 # third  party imports
 from sqlalchemy import Column, String, Integer, DateTime, Boolean
@@ -17,6 +17,7 @@ class Blacklist(Base):
     expires = Column(DateTime, nullable=False)
 
     def to_dict(self):
+        ''' <blacklist> as dict '''
         return {
             'token_id': self.id,
             'jti': self.jti,

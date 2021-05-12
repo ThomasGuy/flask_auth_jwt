@@ -1,3 +1,5 @@
+''' launch production server '''
+
 from project.server import create_app
 from project.server.bitfinex.bfx import bfx
 

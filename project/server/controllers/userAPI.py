@@ -1,16 +1,19 @@
+""" User Protected Resource """
+
 from flask import jsonify, make_response, views, request
 from flask_jwt_extended import (
     jwt_required,
     get_current_user,
     current_user
-    )
+)
 
 
 class UserAPI(views.MethodView):
-    """ User Protected Resource """
+    ''' serve user data '''
     decorators = [jwt_required]
+
     def post(self):
-        # get the post data
+        ''' get the post data then do something with it '''
         post_data = request.get_json()
         auth_header = request.headers.get('Authorization')
         if auth_header:
@@ -29,7 +32,8 @@ class UserAPI(views.MethodView):
             responseObject = {
                 'status': 'success',
                 'get_current_user': get_current_user(),
-                'name': current_user.get('username')
+                'name': current_user.get('username'),
+                'data': f'we got your {post_data}',
             }
             return make_response(jsonify(responseObject)), 200
         else:

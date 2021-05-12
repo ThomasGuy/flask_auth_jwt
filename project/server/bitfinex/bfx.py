@@ -3,7 +3,6 @@
 '''
 import logging
 import os
-import json
 import asyncio
 
 # 3rd party imports
@@ -26,7 +25,6 @@ small = ['BTC', 'ETH', 'XRP', 'LTC']
 tickerDataFields = ['daily_change', 'daily_change_relative', 'last_price',
                     'volume', 'high', 'low']
 
-# vault = TickerBank()  # Ticker dataclass instamces in the TickerBank vault
 vault = {}
 
 bfx = Client(
@@ -35,7 +33,8 @@ bfx = Client(
     logLevel='ERROR',
     dead_man_switch=True,
     channel_filter=['ticker', 'candle'],
-    )
+)
+
 
 @bfx.ws.on('error')
 def log_error(message):
@@ -67,12 +66,15 @@ def bfxws_data_handler(data):
                     'data': update
                 }
 
-                sockio.emit('ticker_update', {'data': payload}, namespace='/api', broadcast=True)
+                sockio.emit('ticker_update', {
+                            'data': payload}, namespace='/api', broadcast=True)
                 # log.debug(f'{sub.symbol} - ticker event')
     else:
         log.info(f'bfx-info: {data}')
 
+
 async def start():
+    ''' start bitfinex api websocket '''
     await bfx.ws.subscribe('ticker', 'tBTCUSD')
     for sym in sym2[1:]:
         # btc = f't{sym}BTC'

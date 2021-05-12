@@ -1,3 +1,4 @@
+''' User class '''
 import datetime
 import uuid
 
@@ -5,7 +6,6 @@ import uuid
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, or_
 
 from .. import Base, flask_bcrypt
-from . import Blacklist
 
 
 class User(Base):
@@ -22,27 +22,36 @@ class User(Base):
 
     @property
     def password(self):
+        ''' password cannot be directly accessed '''
         raise AttributeError('password: write-only field')
 
     @password.setter
     def password(self, password):
-        self.password_hash = flask_bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password_hash = flask_bcrypt.generate_password_hash(
+            password).decode('utf-8')
 
     def check_password(self, password):
+        '''
+        authenicate password
+        :return: Boolean
+        '''
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 
     def __repr__(self):
         return "<User '{}'>".format(self.username)
 
-
     @staticmethod
-    def authenticate(password=None, username=None, email= None, public_id=None):
-        ''' must pass password and at least one other kwarg '''
+    def authenticate(password=None, username=None, email=None, public_id=None):
+        '''
+        Authenticate User
+        :param password and one other
+        :return: authenticated <user>|False
+        '''
         found_user = User.query.filter(or_(
-                User.username==username,
-                User.email==email,
-                User.public_id==public_id
-            )).first()
+            User.username == username,
+            User.email == email,
+            User.public_id == public_id
+        )).first()
 
         if found_user:
             if flask_bcrypt.check_password_hash(found_user.password_hash, password):
@@ -50,6 +59,10 @@ class User(Base):
         return False
 
     def to_dict(self):
+        '''
+        User dictionary
+        :return: dict
+        '''
         return {
             'username': self.username,
             'email': self.email,

@@ -1,3 +1,4 @@
+''' server logging '''
 import logging
 from pathlib import Path
 

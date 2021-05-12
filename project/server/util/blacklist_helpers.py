@@ -16,7 +16,7 @@ def _epoch_utc_to_datetime(epoch_utc):
     return datetime.fromtimestamp(epoch_utc)
 
 
-def add_token_to_database(encoded_token, identity_claim=None): # changed identity_claim to a kwarg
+def add_token_to_database(encoded_token):  # changed identity_claim to a kwarg
     """
     Adds a new token to the database. It is not revoked when it is added.
     :param identity_claim:
@@ -69,7 +69,8 @@ def revoke_token(token_id, user):
     not exist in the database
     """
     try:
-        token = Blacklist.query.filter_by(id=token_id, user_identity=user).one()
+        token = Blacklist.query.filter_by(
+            id=token_id, user_identity=user).one()
         token.revoked = True
         db.commit()
     except NoResultFound:
@@ -82,7 +83,8 @@ def unrevoke_token(token_id, user):
     not exist in the database
     """
     try:
-        token = Blacklist.query.filter_by(id=token_id, user_identity=user).one()
+        token = Blacklist.query.filter_by(
+            id=token_id, user_identity=user).one()
         token.revoked = False
         db.commit()
     except NoResultFound:
@@ -101,4 +103,4 @@ def prune_database():
     for token in expired:
         db.delete(token)
     db.commit()
-    print(len(expired),' entries deleted')
+    print(len(expired), ' entries deleted')

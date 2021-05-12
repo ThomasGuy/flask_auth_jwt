@@ -1,50 +1,55 @@
-import os
-import datetime
+''' project configuration '''
+from datetime import datetime, timedelta
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 load_dotenv()
 
-db_name = 'jwt_auth'
-local_sqldb = 'sqlite:///' + str(Path.cwd()) +'/'
-postgres_local_base = os.getenv('PG_LOCAL', local_sqldb)
+DB_NAME = 'jwt_auth'
+LOCAL_SQLITE_DB = 'sqlite:///' + str(Path.cwd()) + '/'
+postgres_local_base = os.getenv('PG_LOCAL', LOCAL_SQLITE_DB)
 
 
 class Config:
+    ''' Base config '''
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DEBUG = False
     TESTING = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_precious_secret_key')
-    JWT_BLACKLIST_ENABLED = True
-    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
     JWT_ERROR_MESSAGE_KEY = 'message'
 
 
 class DevelopmentConfig(Config):
+    ''' Dev config '''
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name
-    JWT_ACCESS_TOKEN_EXPIRES = 3*60
-    JWT_REFRESH_TOKEN_EXPIRES = 3600*6 # seconds
+    SQLALCHEMY_DATABASE_URI = postgres_local_base + DB_NAME
+    JWT_ACCESS_TOKEN_EXPIRES = 3 * 60
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=20)  # seconds
+
 
 class TestingConfig(Config):
+    ''' test config '''
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name + '_test'
+    SQLALCHEMY_DATABASE_URI = postgres_local_base + DB_NAME + '_test'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    JWT_ACCESS_TOKEN_EXPIRES = 5 # seconds
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=2) # seconds
+    JWT_ACCESS_TOKEN_EXPIRES = 5  # seconds
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = postgres_local_base + db_name
-    FLASK_ENV='production'
-    JWT_ACCESS_TOKEN_EXPIRES = 15*60 # seconds
-    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=3000) # seconds
+    ''' production config '''
+    SQLALCHEMY_DATABASE_URI = postgres_local_base + DB_NAME
+    FLASK_ENV = 'production'
+    JWT_ACCESS_TOKEN_EXPIRES = 15 * 60  # seconds
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=3000)  # seconds
 
 
 config_name = {
-    'dev' : 'DevelopmentConfig',
+    'dev': 'DevelopmentConfig',
     'test': 'TestingConfig',
     'prod': 'ProductionConfig'
 }

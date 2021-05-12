@@ -1,3 +1,4 @@
+''' Initialize apllication '''
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -8,7 +9,12 @@ from project.server.services.events import sockio
 
 jwt = JWTManager()
 
+
 def create_app(Config):
+    ''' application factory
+    params: <config>
+    return app engine
+    '''
     app = Flask(__name__)
     app.config.from_object(Config)
     jwt.init_app(app)
@@ -18,6 +24,7 @@ def create_app(Config):
     CORS(app)
 
     with app.app_context():
+        # pylint: disable=unused-variable, import-outside-toplevel
         from project.server.controllers import auth_blueprint, api_blueprint
         app.register_blueprint(auth_blueprint)
         app.register_blueprint(api_blueprint)
@@ -36,19 +43,22 @@ def create_app(Config):
             }), 401
 
         # Define our callback function to check if a token has been revoked or not
-        @jwt.token_in_blacklist_loader
-        def check_if_token_revoked(decoded_token):
-            return is_token_revoked(decoded_token)
+        @jwt.token_in_blocklist_loader
+        def check_if_token_revoked(jwt_header, jwt_payload):
+            from project.database.models import Blacklist
+            jti = jwt_payload["jti"]
+            token = Blacklist.query.filter_by(jti=jti).scalar()
+            return token is not None
 
-        @jwt.user_loader_callback_loader
-        def user_loader_callback(identity):
+        @jwt.user_lookup_loader
+        def user_loader_callback(_jwt_header, jwt_data):
             from project.database.models import User
-            user = User.query.filter(User.public_id==identity).first()
-            if user is None:
-                return None
-            else:
+            identity = jwt_data["sub"]
+            user = User.query.filter(User.public_id == identity).first()
+            if user:
                 return user.to_dict()
-
+            else:
+                return None
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):

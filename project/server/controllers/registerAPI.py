@@ -1,9 +1,7 @@
-import uuid
-import datetime
+""" User Registration Resource """
 
 from flask import request, make_response, jsonify
 from flask.views import MethodView
-from flask import current_app as app
 from sqlalchemy import or_
 from flask_jwt_extended import create_access_token
 
@@ -11,16 +9,19 @@ from project.database.models import User
 from project.database import db_scoped_session as db
 from project.server.util.blacklist_helpers import add_token_to_database
 
+
 class RegisterAPI(MethodView):
-    """ User Registration Resource """
+    ''' /auth/register '''
+
     def post(self):
+        ''' process user registration '''
         # get the post data
         post_data = request.get_json()
         # check if user already exists
         user = User.query.filter(or_(
-                    User.username==post_data.get('username'),
-                    User.email==post_data.get('email')
-                    )).first()
+            User.username == post_data.get('username'),
+            User.email == post_data.get('email')
+        )).first()
         if user is None:
             try:
                 user = User(

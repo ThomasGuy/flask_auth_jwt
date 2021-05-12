@@ -1,17 +1,21 @@
+''' Logout user '''
 from flask import jsonify, make_response, views
 from flask_jwt_extended import (
     jwt_required,
-    get_raw_jwt
-    )
+    get_jwt
+)
 
 from project.database.models import Blacklist
 from project.database import db_scoped_session
 
+
 class LogoutAPI(views.MethodView):
-    """ logout """
+    """ /auth/logout """
     decorators = [jwt_required]
+
     def get(self):
-        jti = get_raw_jwt()['jti']
+        ''' Logout '''
+        jti = get_jwt()['jti']
         try:
             token = Blacklist.query.filter_by(jti=jti).first()
             token.revoked = True
