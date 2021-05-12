@@ -1,6 +1,6 @@
 '''
-database models and user blacklist
+database models and user blocklist
 '''
 
-from .blacklist import Blacklist
+from .blocklist import Blocklist
 from .user import User

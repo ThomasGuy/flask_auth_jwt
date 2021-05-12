@@ -5,19 +5,19 @@ from flask_jwt_extended import (
     get_jwt
 )
 
-from project.database.models import Blacklist
+from project.database.models import Blocklist
 from project.database import db_scoped_session
 
 
 class LogoutAPI(views.MethodView):
     """ /auth/logout """
-    decorators = [jwt_required]
 
+    @jwt_required()
     def get(self):
         ''' Logout '''
         jti = get_jwt()['jti']
         try:
-            token = Blacklist.query.filter_by(jti=jti).first()
+            token = Blocklist.query.filter_by(jti=jti).first()
             token.revoked = True
             db_scoped_session.commit()
             responseObject = {

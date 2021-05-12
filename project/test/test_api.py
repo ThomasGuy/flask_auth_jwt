@@ -1,14 +1,8 @@
-import unittest
 import json
 import time
-import uuid
-import datetime
 
-from flask_jwt_extended import decode_token
-
-from project.database import db_scoped_session as db
-from project.database.models import User, Blacklist
 from project.test.base import BaseTestCase
+from project.server.util.blacklist_helpers import is_token_revoked
 
 
 class TestApiBlueprint(BaseTestCase):
@@ -18,14 +12,16 @@ class TestApiBlueprint(BaseTestCase):
         time.sleep(5)
         with self.client:
             # user registration
-            resp_register =self.register_user( username='joeseph', email='joeyboy33@gmail.com', password='12345678')
+            resp_register = self.register_user(
+                username='joeseph', email='joeyboy33@gmail.com', password='12345678')
             data_register = json.loads(resp_register.data.decode())
             self.assertTrue(data_register['status'] == 'success')
             self.assertTrue(data_register['access_token'])
             self.assertTrue(resp_register.content_type == 'application/json')
             self.assertEqual(resp_register.status_code, 201)
             # registered user login
-            response = self.login_user( username=None, email='joeyboy33@gmail.com', password='12345678')
+            response = self.login_user(
+                username=None, email='joeyboy33@gmail.com', password='12345678')
             data = json.loads(response.data.decode())
             self.assertTrue(data['status'] == 'success')
             self.assertTrue(data['access_token'])
@@ -48,4 +44,3 @@ class TestApiBlueprint(BaseTestCase):
             else:
                 print('data server fail')
             self.assertTrue(len(data['data']) > 0)
-

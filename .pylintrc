@@ -16,3 +16,6 @@ disable=too-few-public-methods,
         logging-fstring-interpolation,
 
 ignore=test,websockets,rest,utils
+
+[FORMAT]
+max-line-length=100

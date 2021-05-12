@@ -1,4 +1,4 @@
-""" Blacklist """
+""" Blocklist """
 
 # third  party imports
 from sqlalchemy import Column, String, Integer, DateTime, Boolean
@@ -6,8 +6,8 @@ from sqlalchemy import Column, String, Integer, DateTime, Boolean
 from .. import Base
 
 
-class Blacklist(Base):
-    ''' blacklist revoked tokens '''
+class Blocklist(Base):
+    ''' blocklist revoked tokens '''
     __tablename__ = 'tokenBlacklist'
     id = Column(Integer, primary_key=True)
     jti = Column(String(36), nullable=False)
@@ -17,7 +17,7 @@ class Blacklist(Base):
     expires = Column(DateTime, nullable=False)
 
     def to_dict(self):
-        ''' <blacklist> as dict '''
+        ''' <blocklist> as dict '''
         return {
             'token_id': self.id,
             'jti': self.jti,

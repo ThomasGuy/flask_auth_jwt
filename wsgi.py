@@ -4,7 +4,7 @@ flask shell
 flask test
 flask drop
 flask create_db
-flask_prune_db
+flask prune_db
 '''
 
 import unittest
@@ -12,7 +12,7 @@ import unittest
 from project.server import create_app
 from project.server.bitfinex.bfx import bfx
 from project.database import db_scoped_session as db, Base, init_db
-from project.database.models import User, Blacklist
+from project.database.models import User, Blocklist
 from project.server.util.blacklist_helpers import prune_database
 # from project.server.services.events import sockio
 
@@ -26,7 +26,7 @@ def make_shell_context():
     user = User(username= ..., ...)
     db.add(user)
     db.commit()  """
-    return dict(app=app, db=db, User=User, Blacklist=Blacklist)
+    return dict(app=app, db=db, User=User, Blocklist=Blocklist)
 
 
 @app.cli.command()
@@ -60,7 +60,7 @@ def create_db():
 
 @app.cli.command()
 def prune_db():
-    """ Remove all expired tokens from blacklist db """
+    """ Remove all expired tokens from Blocklist db """
     prune_database()
 
 

@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm.exc import NoResultFound
 from flask_jwt_extended import decode_token
+from project.database import db_scoped_session as db
+from project.database.models import Blocklist
 
 from .exceptions import TokenNotFound
-from project.database.models import Blacklist
-from project.database import db_scoped_session as db
 
 
 def _epoch_utc_to_datetime(epoch_utc):
@@ -25,11 +25,11 @@ def add_token_to_database(encoded_token):  # changed identity_claim to a kwarg
     jti = decoded_token['jti']
     token_type = decoded_token['type']
     # user_identity = decoded_token[identity_claim] # this is the original line ??
-    user_identity = decoded_token['identity']
+    user_identity = decoded_token['sub']
     expires = _epoch_utc_to_datetime(decoded_token['exp'])
     revoked = False
 
-    db_token = Blacklist(
+    db_token = Blocklist(
         jti=jti,
         token_type=token_type,
         user_identity=user_identity,
@@ -40,16 +40,16 @@ def add_token_to_database(encoded_token):  # changed identity_claim to a kwarg
     db.commit()
 
 
-def is_token_revoked(decoded_token):
+def is_token_revoked(jwt_payload):
     """
     Checks if the given token is revoked or not. Because we are adding all the
     tokens that we create into this database, if the token is not present
     in the database we are going to consider it revoked, as we don't know where
     it was created.
     """
-    jti = decoded_token['jti']
+    jti = jwt_payload["jti"]
     try:
-        token = Blacklist.query.filter_by(jti=jti).one()
+        token = Blocklist.query.filter_by(jti=jti).one()
         return token.revoked
     except NoResultFound:
         return True
@@ -60,7 +60,7 @@ def get_user_tokens(user_identity):
     Returns all of the tokens, revoked and unrevoked, that are stored for the
     given user
     """
-    return Blacklist.query.filter_by(user_identity=user_identity).all()
+    return Blocklist.query.filter_by(Blocklist.user_identity == user_identity).all()
 
 
 def revoke_token(token_id, user):
@@ -69,7 +69,7 @@ def revoke_token(token_id, user):
     not exist in the database
     """
     try:
-        token = Blacklist.query.filter_by(
+        token = Blocklist.query.filter_by(
             id=token_id, user_identity=user).one()
         token.revoked = True
         db.commit()
@@ -83,7 +83,7 @@ def unrevoke_token(token_id, user):
     not exist in the database
     """
     try:
-        token = Blacklist.query.filter_by(
+        token = Blocklist.query.filter_by(
             id=token_id, user_identity=user).one()
         token.revoked = False
         db.commit()
@@ -99,7 +99,7 @@ def prune_database():
     set it up with flask cli, etc.
     """
     now = datetime.now()
-    expired = Blacklist.query.filter(Blacklist.expires < now).all()
+    expired = Blocklist.query.filter(Blocklist.expires < now).all()
     for token in expired:
         db.delete(token)
     db.commit()

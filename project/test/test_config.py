@@ -1,4 +1,4 @@
-import os
+'''  test config  '''
 import unittest
 
 from flask import current_app as app
@@ -12,12 +12,10 @@ class TestDevelopmentConfig(TestCase):
 
     def test_app_is_development(self):
         self.assertFalse(app.config['SECRET_KEY'] == 'my_precious_secret_key')
-        self.assertFalse(app.config['JWT_SECRET_KEY'] == 'my_precious_secret_key')
+        self.assertFalse(app.config['JWT_SECRET_KEY']
+                         == 'my_precious_secret_key')
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(app is None)
-        self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5432/jwt_auth'
-        )
 
 
 class TestTestingConfig(TestCase):
@@ -27,12 +25,9 @@ class TestTestingConfig(TestCase):
 
     def test_app_is_testing(self):
         self.assertFalse(app.config['SECRET_KEY'] == 'my_precious_secret_key')
-        self.assertFalse(app.config['JWT_SECRET_KEY'] == 'my_precious_secret_key')
+        self.assertFalse(app.config['JWT_SECRET_KEY']
+                         == 'my_precious_secret_key')
         self.assertTrue(app.config['DEBUG'])
-        self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'postgres+psycopg2://bella20:61512@localhost:5432/jwt_auth_test'
-        )
-
 
 
 class TestProductionConfig(TestCase):

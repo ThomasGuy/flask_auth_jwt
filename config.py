@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = postgres_local_base + DB_NAME
     JWT_ACCESS_TOKEN_EXPIRES = 3 * 60
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=20)  # seconds
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=2)  # seconds
 
 
 class TestingConfig(Config):

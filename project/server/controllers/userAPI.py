@@ -10,8 +10,8 @@ from flask_jwt_extended import (
 
 class UserAPI(views.MethodView):
     ''' serve user data '''
-    decorators = [jwt_required]
 
+    @jwt_required()
     def post(self):
         ''' get the post data then do something with it '''
         post_data = request.get_json()
