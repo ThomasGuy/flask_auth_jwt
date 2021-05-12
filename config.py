@@ -18,7 +18,7 @@ class Config:
     TESTING = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_precious_secret_key')
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_ERROR_MESSAGE_KEY = 'message'
 
 
