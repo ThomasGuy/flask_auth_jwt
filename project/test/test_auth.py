@@ -1,10 +1,11 @@
+''' test auth api '''
 import unittest
 import json
 import time
 import uuid
 import datetime
 
-from flask_jwt_extended import decode_token, get_jwt_identity
+from flask_jwt_extended import decode_token
 
 from project.database import db_scoped_session as db
 from project.database.models import User, Blocklist
@@ -229,7 +230,6 @@ class TestAuthBlueprint(BaseTestCase):
                     Authorization='Bearer ' + data_refresh['access_token']
                 )
             )
-            data_final = json.loads(response.data.decode())
             self.assertEqual(response.status_code, 200)
 
     def test_user_status(self):

@@ -15,7 +15,7 @@ disable=too-few-public-methods,
         unused-argument,
         logging-fstring-interpolation,
 
-ignore=test,websockets,rest,utils
+ignore=test_*,
 
 [FORMAT]
 max-line-length=100
