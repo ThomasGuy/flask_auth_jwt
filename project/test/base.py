@@ -1,6 +1,5 @@
+''' test Base class '''
 import json
-import datetime
-import uuid
 
 from flask_testing import TestCase
 from flask import current_app as app

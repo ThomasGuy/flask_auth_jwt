@@ -16,7 +16,7 @@ def _epoch_utc_to_datetime(epoch_utc):
     return datetime.fromtimestamp(epoch_utc)
 
 
-def add_token_to_database(encoded_token):  # changed identity_claim to a kwarg
+def add_token_to_database(encoded_token):
     """
     Adds a new token to the database. It is not revoked when it is added.
     :param identity_claim:

@@ -13,7 +13,7 @@ class Ticker():
     high: float = -0.01
     low: float = -0.01
 
-    def _update(self, **kwargs):
+    def update(self, **kwargs):
         """ update Ticker from dict """
         for key, value in kwargs.items():
             setattr(self, key, value)
