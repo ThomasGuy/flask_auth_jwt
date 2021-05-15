@@ -1,4 +1,4 @@
-''' Initialize apllication '''
+""" Initialize apllication """
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -12,21 +12,22 @@ jwt = JWTManager()
 
 
 def create_app(Config):
-    ''' application factory
+    """application factory
     params: <config>
     return app engine
-    '''
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
     jwt.init_app(app)
     flask_bcrypt.init_app(app)
-    engine = init_db(app.config.get('SQLALCHEMY_DATABASE_URI'))
+    engine = init_db(app.config.get("SQLALCHEMY_DATABASE_URI"))
     sockio.init_app(app, manage_session=False)
     CORS(app)
 
     with app.app_context():
         # pylint: disable=unused-variable, import-outside-toplevel
         from project.server.controllers import auth_blueprint, api_blueprint
+
         app.register_blueprint(auth_blueprint)
         app.register_blueprint(api_blueprint)
 
@@ -35,13 +36,18 @@ def create_app(Config):
         # token attempts to access an endpoint
         @jwt.expired_token_loader
         def my_expired_token_callback(jwt_header, jwt_data):
-            token_type = jwt_data['type']
-            return jsonify({
-                'status': 401,
-                'sub_status': 42,
-                'token_type': token_type,
-                'message': 'The {} token has expired'.format(token_type)
-            }), 401
+            token_type = jwt_data["type"]
+            return (
+                jsonify(
+                    {
+                        "status": 401,
+                        "sub_status": 42,
+                        "token_type": token_type,
+                        "message": "The {} token has expired".format(token_type),
+                    }
+                ),
+                401,
+            )
 
         # Define our callback function to check if a token has been revoked or not
         @jwt.token_in_blocklist_loader

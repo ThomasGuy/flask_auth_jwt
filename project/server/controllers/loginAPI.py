@@ -1,4 +1,4 @@
-''' auth/login '''
+""" auth/login """
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -8,10 +8,10 @@ from project.database.models import User
 
 
 class LoginAPI(MethodView):
-    """ User Login Resource """
+    """User Login Resource"""
 
     def post(self):
-        ''' validate user login '''
+        """validate user login"""
         # get the post data
         credentials = request.get_json()
         try:
@@ -23,22 +23,16 @@ class LoginAPI(MethodView):
                 add_token_to_database(access_token)
                 add_token_to_database(refresh_token)
                 responseObject = {
-                    'status': 'success',
-                    'access_token': access_token,
-                    'refresh_token': refresh_token
+                    "status": "success",
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
                 }
                 return make_response(jsonify(responseObject)), 201
 
             else:
-                responseObject = {
-                    'status': 'fail',
-                    'message': 'User does not exist.'
-                }
+                responseObject = {"status": "fail", "message": "User does not exist."}
                 return make_response(jsonify(responseObject)), 202
         except Exception:
 
-            responseObject = {
-                'status': 'fail',
-                'message': 'Try again'
-            }
+            responseObject = {"status": "fail", "message": "Try again"}
             return make_response(jsonify(responseObject)), 500

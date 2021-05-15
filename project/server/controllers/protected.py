@@ -5,14 +5,14 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity,
     current_user,
-    get_current_user
+    get_current_user,
 )
 
 log = logging.getLogger(__name__)
 
 
 class ProtectedAPI(views.MethodView):
-    """ User Protected Resource """
+    """User Protected Resource"""
 
     @jwt_required()
     def get(self):
@@ -24,8 +24,5 @@ class ProtectedAPI(views.MethodView):
             }
             return make_response(jsonify(response_object)), 200
         except Exception as err:
-            response_object = {
-                "status": "fail",
-                "message": err
-            }
+            response_object = {"status": "fail", "message": err}
             return make_response(jsonify(response_object)), 500
