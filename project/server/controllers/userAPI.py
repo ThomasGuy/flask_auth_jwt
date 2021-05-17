@@ -1,7 +1,7 @@
-""" User Protected Resource """
+""" User Protected Resource '/auth/status' """
 
 from flask import jsonify, make_response, views, request
-from flask_jwt_extended import jwt_required, get_current_user, current_user
+from flask_jwt_extended import jwt_required, current_user
 
 
 class UserAPI(views.MethodView):
@@ -27,14 +27,14 @@ class UserAPI(views.MethodView):
         if access_token:
             responseObject = {
                 "status": "success",
-                "get_current_user": get_current_user(),
+                "current_user": current_user,
                 "name": current_user.get("username"),
                 "data": f"we got your {post_data}",
             }
             return make_response(jsonify(responseObject)), 200
-        else:
-            responseObject = {
-                "status": "fail",
-                "message": "Provide a valid auth token.",
-            }
-            return make_response(jsonify(responseObject)), 401
+
+        responseObject = {
+            "status": "fail",
+            "message": "Provide a valid auth token.",
+        }
+        return make_response(jsonify(responseObject)), 401

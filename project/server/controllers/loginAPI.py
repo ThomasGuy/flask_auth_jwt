@@ -17,7 +17,6 @@ class LoginAPI(MethodView):
         try:
             user = User.authenticate(**credentials)
             if user:
-                # user_claims = app.config['JWT_IDENTITY_CLAIM'] or None
                 access_token = create_access_token(identity=user.public_id)
                 refresh_token = create_refresh_token(identity=user.public_id)
                 add_token_to_database(access_token)
@@ -29,10 +28,9 @@ class LoginAPI(MethodView):
                 }
                 return make_response(jsonify(responseObject)), 201
 
-            else:
-                responseObject = {"status": "fail", "message": "User does not exist."}
-                return make_response(jsonify(responseObject)), 202
-        except Exception:
+            responseObject = {"status": "fail", "message": "User does not exist."}
+            return make_response(jsonify(responseObject)), 202
 
+        except Exception:
             responseObject = {"status": "fail", "message": "Try again"}
             return make_response(jsonify(responseObject)), 500

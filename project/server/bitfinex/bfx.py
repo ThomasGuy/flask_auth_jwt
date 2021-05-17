@@ -3,6 +3,7 @@
 """
 import logging
 import os
+from dataclasses import asdict
 
 # import asyncio
 
@@ -20,7 +21,6 @@ API_SECRET = os.getenv("BFX_SECRET")
 
 symlong = [
     "BTC",
-    "BCH",
     "BSV",
     "BTG",
     "DSH",
@@ -67,45 +67,61 @@ bfx = Client(
 
 @bfx.ws.on("error")
 def log_error(message):
+    """
+    log error message
+    """
     log.error(message)
 
 
 @bfx.ws.on("subscribed")
-def show_channel(sub):
+def show_A_channel(sub):
+    """
+    subscrbed ticker add it to vault
+    """
     symbol = sub.symbol[1:]
-    vault.setdefault(symbol, Ticker(symbol=symbol))
+    vault[symbol] = Ticker(symbol=symbol)
     log.info(f"{symbol} subscribed - added to vault, size = {len(vault)}")
 
 
 @bfx.ws.on("all")
 def bfxws_data_handler(data):
-    if isinstance(data, list):
-        chan_id = data[0]
-        dataEvent = data[1]
-
-        if not isinstance(dataEvent, str) and bfx.ws.subscriptionManager.is_subscribed(
-            chan_id
-        ):
-            sub = bfx.ws.subscriptionManager.get(chan_id)
-            symbol = sub.symbol[1:]
-            if sub.channel_name == "ticker":
-                update = dict(zip(tickerDataFields, dataEvent[4:]))
-                vault[symbol].update(**update)
-
-                payload = {"symbol": str(symbol), "data": update}
-
-                sockio.emit(
-                    "ticker_update", {"data": payload}, namespace="/api", broadcast=True
-                )
-
-    else:
+    """
+    emit ticker updates from bitfinex to all
+    """
+    if isinstance(data, str):
         log.info(f"bfx-info: {data}")
 
 
+@bfx.ws.on("new_ticker")
+def new_ticker_update(data):
+    """
+    a new ticker update has benn issued
+    """
+    symbol = str(data.pair[1:])
+    update = {
+        "daily_change": data.daily_change,
+        "daily_change_rel": data.daily_change_rel,
+        "last_price": data.last_price,
+        "volume": data.volume,
+        "high": data.high,
+        "low": data.low,
+    }
+
+    vault[symbol].update(**update)
+    sockio.emit(
+        "ticker_update",
+        {"data": asdict(vault[symbol])},
+        namespace="/api",
+        broadcast=True,
+    )
+
+
 async def start():
-    """start bitfinex api websocket"""
+    """
+    start bitfinex api websocket
+    """
     await bfx.ws.subscribe("ticker", "tBTCUSD")
-    for sym in sym2[1:]:
+    for sym in symlong[1:]:
         # btc = f't{sym}BTC'
         usd = f"t{sym}USD"
         await bfx.ws.subscribe("ticker", usd)

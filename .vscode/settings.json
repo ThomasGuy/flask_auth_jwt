@@ -5,5 +5,5 @@
     "titleBar.activeForeground": "#e9e5e5",
     "titleBar.inactiveForeground": "#e9e5e5CC"
   },
-  "python.pythonPath": "venv/bin/python3"
+  "python.pythonPath": "/home/bella/miniconda3/envs/flask/bin/python"
 }

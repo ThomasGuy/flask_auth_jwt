@@ -14,6 +14,11 @@ from project.server.util.blacklist_helpers import is_token_revoked
 
 
 class TestAuthBlueprint(BaseTestCase):
+    """
+    test login, logout, register, access and refresh tokens,
+    revoked tokens, expired tokens, user status and protected endpoint
+    """
+
     def test_registration(self):
         """Test - user registration"""
         with self.client:
@@ -227,11 +232,13 @@ class TestAuthBlueprint(BaseTestCase):
             self.assertFalse(
                 is_token_revoked(decode_token(data_refresh["access_token"]))
             )
-            response = self.client.get(
+            response_protected = self.client.get(
                 "/protected",
                 headers=dict(Authorization="Bearer " + data_refresh["access_token"]),
             )
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response_protected.status_code, 200)
+            protected_data = json.loads(response_protected.data.decode())
+            self.assertEqual(protected_data["current_user"]["username"], "joeseph")
 
     def test_user_status(self):
         """Test - user status"""
@@ -256,10 +263,11 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertTrue(data["status"] == "success")
-            self.assertTrue(data is not None)
-            self.assertTrue(isinstance(data["get_current_user"], dict))
-            # self.assertTrue(data['current_user']['admin'] == 'true' or 'false')
+            self.assertTrue(data["name"] == "Thomas")
+            self.assertTrue(isinstance(data["current_user"], dict))
+            self.assertTrue(data["current_user"]["admin"] == "true" or "false")
             self.assertEqual(response.status_code, 200)
+            print("current user: ", data["current_user"])
 
     def test_using_revoked_access_token(self):
         """Test - using revoked access token"""
@@ -290,8 +298,8 @@ class TestAuthBlueprint(BaseTestCase):
             print("data- using revoked access token: ", data)
             self.assertTrue(data["message"] == "Token has been revoked")
 
-    def test_valid_blacklisted_token_logout(self):
-        """Test - logout after a valid token gets blacklisted"""
+    def test_valid_blocklisted_token_logout(self):
+        """Test - logout after a valid token gets blocklisted"""
         with self.client:
             # user registration
             resp_register = self.register_user()
@@ -319,7 +327,7 @@ class TestAuthBlueprint(BaseTestCase):
                 headers=dict(Authorization="Bearer " + data_login["access_token"]),
             )
             data = json.loads(response.data.decode())
-            print("data- logout after a valid token gets blacklisted: ", data)
+            print("data- logout after a valid token gets blaoklisted: ", data)
             self.assertTrue(data["message"] == "Token has been revoked")
             self.assertEqual(response.status_code, 401)
 

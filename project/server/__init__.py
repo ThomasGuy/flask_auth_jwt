@@ -60,8 +60,8 @@ def create_app(Config):
             user = User.query.filter(User.public_id == identity).first()
             if user:
                 return user.to_dict()
-            else:
-                return None
+
+            return None
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):

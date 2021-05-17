@@ -2,7 +2,6 @@
 from dataclasses import asdict
 
 from flask import request, jsonify, make_response, views
-from flask_jwt_extended import jwt_required, current_user
 
 from ..bitfinex.bfx import vault
 
@@ -10,7 +9,6 @@ from ..bitfinex.bfx import vault
 class BfxAPI(views.MethodView):
     """/api/tickers"""
 
-    @jwt_required()
     def get(self):
         """get all tickers"""
         tickerData = []
@@ -19,25 +17,26 @@ class BfxAPI(views.MethodView):
 
         if tickerData:
             response = {"status": "success", "data": tickerData}
-
             return make_response(jsonify(response)), 200
 
-        else:
-            response = {"status": "fail", "message": "Server error"}
-
-            return make_response(jsonify(response)), 500
+        response = {"status": "fail", "message": "Server error"}
+        return make_response(jsonify(response)), 500
 
     def post(self):
-        """get ticker[symbol]"""
+        """
+        return a list of tickers from request
+        :params: post data list of symbols
+        :return: response
+        """
         post_data = request.get_json()
-        ticker = vault[post_data["data"]]
+        tickers = []
+        for symbol in post_data:
+            tickers.append(vault[symbol])
 
-        if ticker:
-            response = {"status": "success", "data": asdict(ticker)}
+        if tickers:
+            response = {"status": "success", "data": tickers}
 
             return make_response(jsonify(response)), 200
 
-        else:
-            response = {"status": "fail", "message": "No such ticker"}
-
-            return make_response(jsonify(response)), 500
+        response = {"status": "fail", "message": "No such ticker"}
+        return make_response(jsonify(response)), 500

@@ -20,4 +20,5 @@ or with Socketio firing:
 
 gunicorn -b 0.0.0.0:7000 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 wsgi:app
 
-Alternativly set .flaskenv to development and use flask shell to play with the database
+Alternativly set .flaskenv to development and flaskapp to 'wsgi.py',
+then use flask shell to play with the database
