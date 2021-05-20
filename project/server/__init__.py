@@ -1,13 +1,15 @@
 """ Initialize apllication """
+import logging
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
-from project.database import init_db, db_scoped_session, flask_bcrypt
+from project.database import init_db, db_scoped_session, _bcrypt
 from project.server.util.blacklist_helpers import is_token_revoked
 from project.server.services.events import sockio
 from project.database.models import Blocklist, User
 
+log = logging.getLogger(__name__)
 jwt = JWTManager()
 
 
@@ -19,10 +21,10 @@ def create_app(Config):
     app = Flask(__name__)
     app.config.from_object(Config)
     jwt.init_app(app)
-    flask_bcrypt.init_app(app)
+    _bcrypt.init_app(app)
     engine = init_db(app.config.get("SQLALCHEMY_DATABASE_URI"))
-    sockio.init_app(app, manage_session=False)
     CORS(app)
+    sockio.init_app(app, manage_session=False)
 
     with app.app_context():
         # pylint: disable=unused-variable, import-outside-toplevel
@@ -57,11 +59,8 @@ def create_app(Config):
         @jwt.user_lookup_loader
         def user_loader_callback(_jwt_header, jwt_data):
             identity = jwt_data["sub"]
-            user = User.query.filter(User.public_id == identity).first()
-            if user:
-                return user.to_dict()
-
-            return None
+            log.info(f"current_user {User.query.filter_by(public_id=identity).all()}")
+            return User.query.filter(User.public_id == identity).first()
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):

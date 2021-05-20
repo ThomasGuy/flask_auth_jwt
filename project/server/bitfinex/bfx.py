@@ -3,9 +3,6 @@
 """
 import logging
 import os
-from dataclasses import asdict
-
-# import asyncio
 
 # 3rd party imports
 from bfxapi import Client
@@ -110,7 +107,7 @@ def new_ticker_update(data):
     vault[symbol].update(**update)
     sockio.emit(
         "ticker_update",
-        {"data": asdict(vault[symbol])},
+        {"data": vault[symbol].as_dict()},
         namespace="/api",
         broadcast=True,
     )

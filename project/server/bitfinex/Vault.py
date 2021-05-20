@@ -1,5 +1,5 @@
 """ Data holder """
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import collections
 
 
@@ -19,6 +19,10 @@ class Ticker:
         """update Ticker from dict"""
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def as_dict(self):
+        """ return as dictionary """
+        return asdict(self)
 
 
 class TickerBank(collections.UserList):

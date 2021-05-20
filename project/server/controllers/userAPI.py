@@ -1,7 +1,9 @@
 """ User Protected Resource '/auth/status' """
-
+import logging
 from flask import jsonify, make_response, views, request
 from flask_jwt_extended import jwt_required, current_user
+
+log = logging.getLogger(__name__)
 
 
 class UserAPI(views.MethodView):
@@ -20,6 +22,7 @@ class UserAPI(views.MethodView):
                     "status": "fail",
                     "message": "Bearer token malformed.",
                 }
+                log.info("userApi: Bearer token malformed.")
                 return make_response(jsonify(responseObject)), 401
         else:
             access_token = ""
@@ -27,9 +30,8 @@ class UserAPI(views.MethodView):
         if access_token:
             responseObject = {
                 "status": "success",
-                "current_user": current_user,
-                "name": current_user.get("username"),
-                "data": f"we got your {post_data}",
+                "current_user": current_user.to_dict(),
+                "data": f"we got your {post_data['statement']}",
             }
             return make_response(jsonify(responseObject)), 200
 
@@ -37,4 +39,6 @@ class UserAPI(views.MethodView):
             "status": "fail",
             "message": "Provide a valid auth token.",
         }
+        log.info("userApi: Provide a valid auth token.")
+
         return make_response(jsonify(responseObject)), 401

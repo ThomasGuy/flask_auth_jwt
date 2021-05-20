@@ -13,6 +13,7 @@ disable=too-few-public-methods,
         no-member,
         broad-except,
         unused-argument,
+        unused-import,
         logging-fstring-interpolation,
 
 ignore=test_*,

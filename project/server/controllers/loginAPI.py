@@ -1,4 +1,4 @@
-""" auth/login """
+"""User Login Resource"""
 from flask import request, make_response, jsonify
 from flask.views import MethodView
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -8,7 +8,7 @@ from project.database.models import User
 
 
 class LoginAPI(MethodView):
-    """User Login Resource"""
+    """ auth/login """
 
     def post(self):
         """validate user login"""

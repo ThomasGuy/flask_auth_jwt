@@ -1,6 +1,5 @@
-""" /protected """
+"""User Protected Resource"""
 import logging
-
 from flask import jsonify, make_response, views
 from flask_jwt_extended import (
     jwt_required,
@@ -11,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 class ProtectedAPI(views.MethodView):
-    """User Protected Resource"""
+    """ /protected """
 
     @jwt_required()
     def get(self):
@@ -25,4 +24,5 @@ class ProtectedAPI(views.MethodView):
 
         except Exception as err:
             response_object = {"status": "fail", "message": err}
+            log.info("protected api error, auth?")
             return make_response(jsonify(response_object)), 500
