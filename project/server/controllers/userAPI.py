@@ -31,7 +31,7 @@ class UserAPI(views.MethodView):
             responseObject = {
                 "status": "success",
                 "current_user": current_user.to_dict(),
-                "data": f"we got your {post_data['statement']}",
+                "data": f"we got your {post_data}",
             }
             return make_response(jsonify(responseObject)), 200
 

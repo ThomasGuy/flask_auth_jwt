@@ -18,7 +18,7 @@ class ProtectedAPI(views.MethodView):
         try:
             response_object = {
                 "status": "success",
-                "current_user": current_user,
+                "current_user": current_user.to_dict(),
             }
             return make_response(jsonify(response_object)), 200
 

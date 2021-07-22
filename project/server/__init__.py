@@ -60,7 +60,7 @@ def create_app(Config):
         def user_loader_callback(_jwt_header, jwt_data):
             identity = jwt_data["sub"]
             log.info(f"current_user {User.query.filter_by(public_id=identity).all()}")
-            return User.query.filter(User.public_id == identity).first()
+            return User.query.filter_by(public_id=identity).one_or_none()
 
         @app.teardown_appcontext
         def shutdown_session(exception=None):

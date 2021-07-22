@@ -263,7 +263,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertTrue(data["status"] == "success")
-            self.assertTrue(data["name"] == "Thomas")
+            self.assertTrue(data["current_user"]["username"] == "Thomas")
             self.assertTrue(isinstance(data["current_user"], dict))
             self.assertTrue(data["current_user"]["admin"] == "true" or "false")
             self.assertEqual(response.status_code, 200)
