@@ -37,7 +37,7 @@ class BfxAPI(views.MethodView):
         post_data = request.get_json()
         tickers = []
         for symbol in post_data:
-            tickers.append(vault[symbol])
+            tickers.append(asdict(vault[symbol]))
 
         if tickers:
             response = {"status": "success", "data": tickers}

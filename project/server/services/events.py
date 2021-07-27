@@ -6,24 +6,24 @@ from flask import request
 
 
 log = logging.getLogger(__name__)
-sockio = SocketIO( cors_allowed_origins=[])
+sockio = SocketIO(cors_allowed_origins=[])
 
 
-@sockio.on('connect')
+@sockio.on("connect")
 def test_connected():
-    emit('my response', {'data': 'Connected'})
+    emit("my response", {"data": "Connected"})
     log.info(f"socketio: {request.sid} connected")
 
 
-@sockio.on('disconnect')
+@sockio.on("disconnect")
 def test_disconnect():
     print(f"socketio: {request.sid} disconnected")
     log.info(f"socketio: {request.sid} disconnected")
 
 
-@sockio.on('message', namespace='/api/ticker')
+@sockio.on("message", namespace="/api/ticker")
 def messsage_handler(msg):
-    emit('my response', {'data': msg['data']})
+    emit("my response", {"data": msg["data"]})
 
 
 # @sockio.on('ticker_update')
@@ -31,6 +31,6 @@ def messsage_handler(msg):
 #     emit('ticker_update', json)
 
 
-@sockio.on('event')
-def handle_event(json):
-    emit('Ahoy there', {'data': 42})
+@sockio.on("event")
+def handle_event(payload):
+    emit("Ahoy there checkout this event! ", {"data": 42})

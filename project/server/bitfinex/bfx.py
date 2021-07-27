@@ -57,7 +57,6 @@ bfx = Client(
     # API_KEY=API_KEY,
     # API_SECRET=API_SECRET,
     logLevel="INFO",
-    dead_man_switch=True,
     channel_filter=["ticker", "candle"],
 )
 
@@ -123,6 +122,12 @@ async def start():
         usd = f"t{sym}USD"
         await bfx.ws.subscribe("ticker", usd)
         # await bfx.ws.subscribe('ticker', btc)
+
+
+async def stop_bfx():
+    """ stop the web socket nicely """
+    await bfx.ws.unsubscribe_all()
+    await bfx.ws.stop()
 
 
 bfx.ws.on("connected", start)
