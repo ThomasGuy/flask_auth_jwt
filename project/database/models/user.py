@@ -1,34 +1,36 @@
-""" User class """
+"""User class"""
+
 import datetime
 import uuid
 
 # third  party imports
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, or_
+from sqlalchemy import Boolean, Column, DateTime, String, or_
+from sqlalchemy.sql.sqltypes import Integer
 
 from .. import Base, _bcrypt
 
 
 class User(Base):
-    """ User: <user> """
+    """User: <user>"""
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(50), unique=True)
     email = Column(String(255), unique=True, nullable=False)
     public_id = Column(String(100), default=str(uuid.uuid4()))
-    registered_on = Column(DateTime, default=datetime.datetime.utcnow())
+    registered_on = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
     admin = Column(Boolean, nullable=False, default=False)
     password_hash = Column(String(100))
 
     @property
     def password(self):
-        """ password cannot be directly accessed """
-        raise AttributeError("password: write-only field")
+        """password cannot be directly accessed"""
+        raise AttributeError('password: write-only field')
 
     @password.setter
     def password(self, password):
-        self.password_hash = _bcrypt.generate_password_hash(password).decode("utf-8")
+        self.password_hash = _bcrypt.generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
         """
@@ -66,8 +68,8 @@ class User(Base):
         :return: dict
         """
         return {
-            "username": self.username,
-            "email": self.email,
-            "admin": self.admin,
-            "public_id": self.public_id,
+            'username': self.username,
+            'email': self.email,
+            'admin': self.admin,
+            'public_id': self.public_id,
         }

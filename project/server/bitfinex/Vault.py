@@ -1,6 +1,7 @@
-""" Data holder """
-from dataclasses import dataclass, asdict
+"""Data holder"""
+
 import collections
+from dataclasses import asdict, dataclass
 
 
 @dataclass
@@ -21,7 +22,7 @@ class Ticker:
             setattr(self, key, value)
 
     def as_dict(self):
-        """ return as dictionary """
+        """return as dictionary"""
         return asdict(self)
 
 
@@ -54,5 +55,5 @@ class TickerDict(collections.UserDict):
             try:
                 tickers.append(self[sym])
             except KeyError:
-                tickers.append(f"Error {sym}: No such {sym}")
+                tickers.append(f'Error {sym}: No such {sym}')
         return tickers
